@@ -1,0 +1,14 @@
+nodeendo 9:18 PM I think I came up with a solution to the problem allowing users to have to option to login with their username, and still have the passwords tucked away by still using Firebases' "E-mail & Password" Authentication option.... What I'm doing is creating a separate firebase array that keeps track of all registered Usernames and Associate E-mails together and only those two... what now happens is when someone Goes to sign up it scans to see if the Username has already been taken... if it hasn't it then boolean true continues with attempting to create the traditional E-mail & Password account with Firebase, if the E-mail & password successfully registers it then will also register the Username & associated E-mail (alias) into the 'accounts' array entry... so then when the user attempts to login using something other than an e-mail address it will attempt to login by scanning the 'accounts' array for the username entered and retrieve the e-mail associated with that username.... then the e-mail is retrieved and used with the typed in password in the backend as usual, just as if the user typed in the e-mail instead of the username..
+password will still be tucked away and not have access.
+should be done with it by tonight.
+that feature.
+
+nodeendo 9:45 PM Update... using an Array would take up too much resources just going to make regular JSON obj entries under
+'https://todolog.firebaseio.com/todolog/accounts/'+$rootScope.username+'/' that way I could use a reference.once("value",function(data_obj){}); to see if it already exists in the table... because we both know that most databases and most likely firebase has a binary search mechanism that's faster on the server side to do the selecting of db entries... 
+
+nodeendo 5:09 PM I had to use the $q.deffer() service&method
+'var inst=$q.deffer()'
+to create an asynchronous promise that only triggers the 'then()' method following the service call and returning the:
+'inst.resolve({obj_key:val})' following 'inst.promise()' as the parameter inside 'then()' that follows the service call... and used that value to determine weather login was successful or not and decide where to redirect the UI Router. 
+
+nodeendo 11:14 PM Guess what, homey! we got services handling our username 2 email exchanges workin, gonna push.

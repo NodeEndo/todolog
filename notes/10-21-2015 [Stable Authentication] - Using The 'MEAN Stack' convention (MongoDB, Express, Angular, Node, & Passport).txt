@@ -1,0 +1,251 @@
+----- October 10th -----
+
+3lfist [3:04 PM]
+when I tried logging in via email method and entered *****  into  the password and email text fields and press enter I get a JS alert box with a sign in form with email and password fields. I enter ******  both times again and I get "Now you can test the 'ensureAuth' middleware function which checks to see if 'req.isAuthenticated()' is 'true' wich continues normal execution 'next()' otherwise if 'false' it displays 'Forbidden' or executes a 'res.send(403)'. To test it out go enter the URL: https://serene-tundra-1851.herokuapp.com/api/data". Then I pressed Logout button and it brings up page "Cannot GET /logout". Then I have to restart browser or computer to try again. Not sure which. Did not fully test.
+
+nodeendo [8:07 PM] 
+oh it's all good, yeah I never configured a logout/path method for the link, but if you had just went to https://*********.herokuapp.com/api/data while logged in it'd display some json data and if you werent logged in it'd display a 403 error "Forbidden" because  you wouldn't be authenticated anymore, with the facebook login  you use your ********* account and your actual facebook password for that and you'd actually would authenticate using passport-facebook
+
+nodeendo [8:08 PM]
+anyways I'm still getting the hang of the MEAN app file structure it's pretty cool actually i like it's modular structure
+
+nodeendo [8:09 PM]
+I'm taking notes of how to construct a very minimal MEAN app.
+
+nodeendo [8:09 PM]
+[Legend]:
+->"Parent Directory"
+\_>"Sub-Directory"
+|_>"Files Inside Sub-Directory"
+-------------------------------
+[File Structure]:
+git_dir ->app (node server)
+    \_>models->nerd.js (mongoose | MongoDB 'Nerd' Model)
+       |_>routes.js (node server routes & global (arbitrary,'*') 'Angular' routes)
+    ->config (node server)->db.js (mongoose | MongoDB Database URL)
+    ->server.js (global node server configuration)
+    ->node_modules (npm Installs)
+    ->public (Angular 'Frontend' Files)
+    \_>libs (Bower Installs)
+    \_>views (Angular Pages|'views')
+    |_>index.htm, about.html, faq.html
+    \_>js (Angular Controllers & Services)
+    |_>appRoutes.js (Angular Specific Routes)
+    |_>app.js (Ties Angular: Routes, Controllers & Services Into 1 App Identifier 'name')
+     \_>controllers->controller_01.js
+     \_>services->service_01.js
+
+----- October 14th -----
+
+nodeendo [2:00 AM] 
+hey, I know I haven't gotten back to you in a few days, I've been working on it :simple_smile:,
+today I just translated what we have already with Todolog into a MEAN stack file structure,
+created a angularCtrl.js file (module) to house the controllers, angularServices.js file (module) to house the Todolog services...
+I plan on changing the authentication from what we have with AngularFire to Passport and MongoDb, tomorrow my goal is to create an MongoDb (Username|E-mail & Password) signup
+and HTTP Passport strategy for login, then will add the social media passports of course.
+
+3lfist [11:25 AM] 
+That's fine and I'm happy to hear of your progress. :simple_smile: You're last git push was 9 days ago. Worried that you're not pushing enough. Is it because you're in a learning phase and haven't made enough changes to be push worthy?
+
+3lfist [11:25 AM]
+I'm excited to test out the MEANified app with Passport social loginability enabled!
+
+----- October 15th -----
+
+nodeendo [5:05 AM] 
+yes exactly! :simple_smile: I'm still learning however now starting to modify Todolog with the new MEAN stack format... nothing git worthy enough to publish on the GitHub Todolog repository yet.... but I'm using this as a testing ground: 
+https://*********.herokuapp.com/
+
+nodeendo [5:06 AM]
+just got Facebook authentication working using PassportJS for todolog, you can try logging in with your ********* facebook account and you will see your image and display name load, but that is all... no MongoDB yet....
+
+nodeendo [5:06 AM]
+I gotta get some sleep, tty-soon
+
+nodeendo [5:09 AM]
+there's going to be a major makeover for the programming soon, a lot to delete from the Firebase version, Passport changes everything, 
+night/day :stuck_out_tongue: gotta get some sleep
+
+nodeendo [5:14 AM] 
+one last thing I had to use $window.location.href="/auth/facebook"; in a angular service in order to emulate a anchor <a href="/auth/facebook"><a> link-click for the "Log in with Facebook" button that uses the ng-click, because the $routeProvider/ngRoute/angular-router was interfering with the communication between angular & node/express when I tried using $http.get('/auth/facebook')....
+
+nodeendo [5:16 AM]
+doesn't work with $http service, but works well with $window.location.href="/auth/facebook".
+
+3lfist [6:56 PM] 
+Ok man. Keep at it! Oh by the way.On the UI design front of things, I will be designing the mobile version of this app first. It's a design technique called mobile first design. And this got me to thinking that maybe we should consider Ionic http://ionicframework.com/ One can build mobile apps using HTML/JS/CSS. Good thing is that Ionic and Angular work very well together.
+
+3lfist [7:06 PM] 
+If we go with using Ionic then the task of making Todolog available for iOS and Android is taken care for us. The problem lies in the fact that the apps will not be as fast as natively built apps which sucks. But there are advantages http://blog.teamtreehouse.com/ionic-reigniting-native-vs-html5-debate 
+
+3lfist [7:07 PM]
+The reason I bring this up is that I see mobile becoming the new norm and I see Todolog being perfect for mobile phones and tablets.
+
+3lfist [7:07 PM]
+It's one of those things that is always with you.
+
+3lfist [7:07 PM]
+Todolog can act as a guide or mentor.
+
+3lfist [7:09 PM]
+so something to consider. Let me know your thoughts.  And check out this google search for 'mean and ionic' https://www.google.pl/search?{google:acceptedSuggestion}{google:originalQ%E2%80%8C%E2%80%8BueryForSuggestion}sourceid=chrome&ie=UTF-8&q=mean+and+ionic
+
+nodeendo [8:25 PM] 
+k cool, I'll look into it later tonight, just letting you know the passport login is broken at the moment, not sure where the internal server error is coming from all of a sudden I'll let you know when it's back up.
+
+----- October 16th -----
+
+nodeendo [2:59 AM] 
+k, I got Facebook, Twitter & Google authentication going but I haven't implemented Mongoose/MongoDb yet.. so at the moment whenever the '/login' route is loaded it will display that UX prompt of whether or not the end-user wishes to proceed to create an account using that selected Social Media account as if the user hasn't already yet, it's to demonstrated the same UX procedural routine that existed with Firebase however it's not linked up to any database at the moment.... hopefully I will begin to implement Mongo tomorrow, I think it's important to begin doing that to complete the authentication.
+
+nodeendo [3:00 AM]
+Oh yeah and profile images will now load too... This is using PassportJS.
+
+3lfist [6:54 PM] 
+i checked it out but its pretty buggy. i will wait until you've worked out the bugs. i mean there are a lot of bugs right now.
+
+3lfist [6:55 PM]
+when i press log in and it loads the /login route I see a message "Your account "" is currently not connected to Todolog.". Why is that being shown?
+
+3lfist [6:56 PM]
+then the button below says 'sign up to todolog via" and it gives no options but who cares because that whole modal window shouldn't even be there
+
+3lfist [6:57 PM]
+when i click sign up it just gives me email method. i see no facebook, twitter and google methods
+
+3lfist [7:00 PM]
+i can only sign up to twitter by first clicking the twitter button on the sign in page. it then gives me the message "Your account "3lfist" is currently not connected to Todolog." Then the sign up button is there and when I click it I sign up with twitter 3lfist. these weird UX issues have to be worked out.
+
+3lfist [7:00 PM]
+but listen, great job so far. let me know when you are done getting it to where it was before but don't do more than that becuase i have to review it and make a list of changes to perfect the UX.
+
+nodeendo [7:05 PM] 
+I'm having isp connectivity probs....
+
+3lfist [7:05 PM] 
+ok
+
+nodeendo [7:06 PM] 
+im just reading ow
+
+3lfist [7:06 PM] 
+this is the worst internet connection you ever had
+
+nodeendo [7:06 PM] 
+now*
+
+3lfist [7:06 PM] 
+ok
+
+nodeendo [7:07 PM] 
+oh dude... I didn't even get that far enough to implement mongodb yet...
+
+nodeendo [7:07 PM]
+so you can't signup log log in using e-mail & password that functionality is broken at the moment
+
+3lfist [7:10 PM] 
+i didnt even get that far and try that
+
+nodeendo [7:10 PM] 
+and that UX window asking whether or not the end user wishes to continue with their social media account would normally only show up after the user logs in with either google facebook or twitter for the first time, i tried explaining that to you with what I wrote last night, that was there in the last Firebase enabled version, right now it just displays as soon as the login route loads because I haven't hooked up mongodb yet to actually check whether or not an account has been created on todolog for that social media account
+
+3lfist [7:10 PM] 
+its cool
+
+3lfist [7:11 PM]
+it's late here now so i have to go. i'm going to be working on the mobile designs soon.
+
+nodeendo [7:11 PM] 
+it's buggy i know
+
+nodeendo [7:11 PM]
+k cool
+
+3lfist [7:11 PM] 
+i still have to also present you with basic functionality
+
+3lfist [7:11 PM]
+document.
+
+3lfist [7:11 PM]
+later tho
+
+3lfist [7:12 PM]
+ok well take care
+
+nodeendo [7:12 PM] 
+i'm trying to get mongo lab working with heroku
+
+nodeendo [7:12 PM]
+k ttyl peace
+
+3lfist [7:12 PM] 
+nice!
+
+3lfist [7:12 PM]
+ok cool. see ya peace!
+
+nodeendo [7:12 PM] 
+yeah i'll catch you later
+
+nodeendo [7:12 PM]
+:simple_smile:
+
+3lfist [7:12 PM] 
+:simple_smile:
+
+nodeendo [7:47 PM] 
+When you get the chance, I'm not sure if this was the problem you experienced when you installed mongodb on your computer, but if it was they now have a patch for 'garbage collection' clearing memory 
+They have a message marked in yellow on the download page, under the "Overview" heading at the top.
+"IMPORTANT
+If you are running any edition of Windows Server 2008 R2 or Windows 7, please install a hotfix to resolve an issue with memory mapped files on Windows." 
+http://docs.mongodb.org/master/tutorial/install-mongodb-on-windows/?_ga=1.75423889.2002571230.1445027690
+
+I'm still going to work with MongoLab sandbox on heroku and see if I can establish a connection using MongoVUE (free) 
+http://www.mongovue.com/
+MongoDB Manual 3.0 Install MongoDB on Windows
+
+----- October 18th -----
+
+3lfist [9:40 AM] 
+ok sounds good. yeah stick with mongo lab. less worry. mongo vue looks interesting. guess it's like the firebase forge
+
+nodeendo [8:49 PM] 
+yeah, I've actually been using the mongo.exe client that comes with mongo to connect to MongoLab sandbox online which is also connected to my Heroku account, I learned a lot about Mongo the day before yesterday, it's actually pretty fun... today I decided to create a basic/small isolated MEAN app just to work on new techniques that I'm learning, so once I get them figured out I'll then apply the same techniques to the todolog app project it's just really difficult learning new techniques within the same project that is being translated, too much going on in one screen.
+The one issue that I'm trying to figure out is why the $http() service within angular isn't invoking a post to Express.... I've tried various ways of formatting the post request too... I'm not sure if it's an node.js isolated issue with the way the directories are referenced.... this is why I am working issues like these on a smaller scale so once they're figured out I can then easily implement them in Todolog.
+
+----- October 19th -----
+
+nodeendo [12:15 AM] 
+Finally found out that when posting data to Express using Angulars' $http service you can't use $http.post shorthand method because it doesn't have the correct header 'Content-Type' to indicate to the 'body-parser' module/middleware on node that the data being posted is 'url encoded' ... 
+So I had to use just the angular $http service without the post'
+
+nodeendo [12:20 AM] 
+'post' shorthand method and instead configure the $http service with a Header of...
+'Content-Type':'application/x-www-form-urlencoded'
+
+Link below,
+
+var route_path='/login';
+var data_to_submit=("username="+this.username+"&password="+this.password);
+$http({method:'POST',url:route_path,data:data_to_submit,headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+
+nodeendo [12:25 AM]
+so hopefully tomorrow I'll be able to plug the data requests express receives into mongodb... once I learn how to do that I'm pretty much set.
+
+3lfist [6:10 AM] 
+interesting. very interesting. no problem on having to do a mini project to get to understand mongo better. i've had to do those for sure in the past. :simple_smile: looking forward to see this all in action!
+
+----- Today October 21st, 2015 -----
+
+nodeendo [8:24 AM] 
+yup :simple_smile:, I decided to stay up and work on it, I'm planning on going to sleep earlier than I have been lately, tonight, I need to reset my schedule.
+
+nodeendo [8:31 AM] 
+I started implementing Mongoose with Todolog, now you can register an account which saves a salted & hashed password and does the reversal when logging in....
+The only thing is right now while I'm still working on other features, the hashed password is visible because I have it saved with a key as unruled_hash: instead of hash: because for some reason, idk why but 
+when it's saved as hash: I'm unable to retrieve it/read it from the document|record... I have to look that up, it probably has to do with rules, if mongoDB also uses rules...
+
+nodeendo [4:37 PM] 
+Alright, it seems as like the new Todolog &  Social Media registration + login, w/account initialization is stable and working fluently with the 'MEAN'-stack convention (MongoDB, Express, Angular, Node, & Passport) 
+I haven't pushed any new revisions on the Todolog GitHub account for practically 3 weeks so I think I've accomplished enough to save my progress for archival, just in case I ever need to clone or fork it later on. 

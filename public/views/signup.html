@@ -1,0 +1,16 @@
+<div class="signup-ui block">
+<h2>Sign up:</h2>
+	<form name="signup_ui_frm"  ng-submit="signup_ui_frm.$valid && signup.reg()" ng-validate="novalidate">
+		<ul class="li_block">
+			<li><p id="signup_feedback"></p></li>
+			<li><input type="text" id="user_input" ng-model="signup.username" class="form-control" placeholder="Please enter a username." required/></li>
+			<li><input type="email" id="email_input" ng-model="signup.email" class="form-control" placeholder="Please enter your E-mail here." required/></li>
+			<li><ul class="neg_ws">
+				<li class="inline"><input type="password" id="signup_pass_input" ng-model="signup.pass" class="form-control" placeholder="Please enter your Password here." required/></li>
+				
+				<li class="inline"><button type="button" class="btn btn-default pull-right glyphicon glyphicon-eye-close">
+				</button></li>
+			</ul></li>
+		<li><input type="submit" value="Sign up" class="btn-success btn-danger form-control"/></li>
+	</form>
+</div>

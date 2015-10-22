@@ -1,0 +1,16 @@
+The resorting feature is a nice touch though I don't think most users will ever need the undo feature. 
+I imagined that the undo would be useful just in case the user accidentally pressed Done on a todo. Still that is a nice touch for the edge cases.
+
+So there are a few minor changes that should be made to labeling of buttons. 
+The "Add Category!" button should be "+ Add Todo". No need for the "!".  
+You can also get rid of the colons after "Todo", "Todos" and "Done"
+Also add an <h1> with Todolog text in there as a fake placeholder logo.
+and add some palceholder text in the todo text field that says "e.g. Work on time machine". 
+It's a silly and funny todo example that can bring a slight inner smile to a person's mood matrix.
+
+Here is how to change/add placeholder text in angularjs 
+http://stackoverflow.com/questions/17713137/change-value-of-input-placeholder-via-model
+
+It would be cool with this method we can rotate between 5 to 10 funny quirky placeholder Todo examples
+
+After those minor changes then we can make bigger moves with this app. I'm excited. The progress you made is dope. I will also work on more designs.

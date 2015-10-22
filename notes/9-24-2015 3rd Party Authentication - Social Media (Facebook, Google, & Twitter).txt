@@ -1,0 +1,95 @@
+3lfist [4:05 AM] 
+Ok I see what you are aiming for and the ability to save todos individually and as groups is part of the original specs. So that is great you were able to do that :simple_smile: Save that functionality for sure. The only problem lies in the Firebase data structure.  We really have to make sure it's as efficient and fast as possible.  So I think before continuing making more functions that store new types of data, we should really understand data structure best practices from that Firebase doc.
+
+3lfist [4:09 AM]
+Believe me, I also want to see the mroe complicated functionality of Todolog implemented but I know if it's not built in the right order it may collapse.
+
+
+nodeendo [1:14 PM] 
+I understand what you're talking about, the save table is right now only a 2 dimensional array stored as 'save' in firebase one step down from the Username.... 
+Accounts->
+                      Username->
+                                               Save->[save_index:0->{ 'Todos'->[0:'Brush Teeth', 2:'Make Lunch'] | 'Done'->[1:'Shower', 3:'Make Dinner'] }, 
+                                                                save_index:1->{'Todos'->[0:'Have Dessert', 1:'Watch Mr. Robot', 3:'Sleep'] 'Done'->[2:'Program'] } ]
+
+---->**** var save_ref=new Firebase('https://todolog.firebaseio.com/accounts/'+$rootScope.username+'/save/'); ****
+fb_arraySave=$firebaseArray(save_ref);
+this.save=fb_arraySave;
+this.save=function(){
+         tmp_json={"index":pred_succ_index(path,'save'),"todos":path.todo,"done":path.done}; //Compile/Package a new Save entry.
+         path.save.$add(tmp_json) // 'path.save' points to 'this.save' which references $firebaseArray(save_ref);
+}
+Firebase App Dashboard
+
+nodeendo [1:19 PM]
+But I know you're concerned about large scale server processing power etc.... basically traversing to the 'Save' array is only 3rd level deep. $firebaseArray(save_ref) points to that 'Save' array, it can grab/query only what is needed such when editing or removing a single 'save' entry, in this example, ( 'save_index':0 | 'save_index':1)
+
+
+nodeendo [1:25 PM] 
+I used...
+
+this.remove=function(path,item){
+        var item_index=path.save.indexOf(item);
+               path.save.$remove(item_index);
+}
+In this example...  item_index='save_index':1     it would remove just the array entry associated under save_index:1.
+
+nodeendo [1:27 PM]
+it wouldnt seek anywhere else...
+
+nodeendo [1:32 PM] 
+however, I definitely agree with you on disliking the way Firebase identifies it's dynamic indexes... they're very ugly/serial... I don't understand why they couldn't create the $firebaseArray() service to be able to pass an argument 'parent_label' or just use the /save/ directly as the parent for 'save_index:0' | 'save_index:1' etc... instead they have that ugly serial.
+
+3lfist [3:54 PM] 
+Don't worry about the save feature right now. It's great you did what you did but not really the priority. Trello tasks should be the focus. I'm hoping we can have an MVP (minimum viable product) completed by the beginning of December. Core functionality with decent styling.  So if we hit all core tasks then we are getting closer to that MVP.
+
+3lfist [5:00 PM] 
+This is what you'd face if you were doing work for a client. Trust me. I'm facing this every week doing design work for a startup based in the US. If I'm not on point with my deliverables (finishing all my tasks) then I am questioned. That means I'm under review for being kicked out. Hopefully Todolog will make money and we'd never haveto do client work but who knows.
+
+nodeendo [7:45 PM] 
+don't worry I agree with what you're saying :simple_smile:. Yup I understand what you mean about working for client's, even though I haven't had any myself before I could imagine the demands.
+
+nodeendo [10:46 AM] 
+I'm going to have to register a real facebook and twitter account in order to activate our app, they make you use your cellphone for the activation process they text you a special serial #.
+
+3lfist [12:36 PM] 
+right exactly :simple_smile: cool.
+
+3lfist [12:37 PM]
+it's going to be amazing once we have Twitter and Facebook sign up and sign in ability
+
+3lfist [12:37 PM]
+Also Google. People will join more then.
+
+nodeendo [1:27 PM] 
+yeah I'll probably be able to set it up, Firebase seems to make the oAuth process easier.
+
+nodeendo [1:28 PM]
+I've tried learning the CURL library for php in the past and it's more difficult doing the authentication according to spec's with SSL Certs...
+
+nodeendo [1:29 PM]
+it requires a lot more work compared to Firebase
+
+nodeendo [1:37 PM] 
+Yeah I may start doing that Trello task first, 3rd party Authentication... We're going to have to discuss how you want people to save their Todo/Done lists each day, I think it should have something like, Choose a Month->Day, and it'd assign the numerical equivalents to the virtualized index properties respectively.
+
+nodeendo [1:40 PM]
+like what's right now the 'save_index' property would have the numerical equivalent of the day.
+
+nodeendo [1:41 PM]
+but right now the focus is really on getting that Authentication process covered...
+
+3lfist [6:14 PM] 
+when i first speccing out todolog i was getting into all of that fun functionality but getting the boring stuff out of the way first is smarter. kind of like doing homework when ya first get home so the rest of the night is light.
+
+3lfist [6:17 PM]
+but saving todos is critical obviously and when a user wants to populate a future day with todos, they should be able to just be presented a inteligently arranged list that can be filtered and sorted. the smartest way to do that is via a mix of sorting and tagging. but more on that later. also a user should be able to create a todo group which can be applied to days or sections of a day.
+
+3lfist [6:18 PM]
+but don't work on that now because we got priorities and it's not fully and logically specced out. there maybe design flaws in what i just described
+
+3lfist [6:18 PM]
+just havent thought too hard about it.
+
+nodeendo [11:50 PM] 
+Okay, I got Facebook, Twitter, & Google authentication all set up and working, going to make a notes file then push.

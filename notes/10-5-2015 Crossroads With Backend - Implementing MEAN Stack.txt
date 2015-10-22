@@ -1,0 +1,315 @@
+nodeendo [3:11 PM] 
+now if there were a way to configure forge to handle the data internally using Firebase rules I'd eventually switch over to that to handle the pure authentication process
+
+nodeendo [3:11 PM]
+but I'm lacking intelligence in that area
+
+3lfist [3:12 PM] 
+what do you mean? you mean you want to control firebase data with in firebase?
+
+nodeendo [3:12 PM] 
+yup if possible
+
+3lfist [3:12 PM] 
+like manipulate the data with firebase rules?
+
+3lfist [3:12 PM]
+impossible.
+
+nodeendo [3:12 PM] 
+damn...
+
+3lfist [3:12 PM] 
+Firebase is not a real server
+
+nodeendo [3:12 PM] 
+cause with php the data processing is done on the server side...
+
+3lfist [3:12 PM] 
+If you want to do that we'd have to move to ExpressJS and MongoDB
+
+3lfist [3:13 PM]
+Yes!
+
+3lfist [3:13 PM]
+I know
+
+nodeendo [3:13 PM] 
+right now with firebase it's mostly client driven , firebase is just a stash
+
+3lfist [3:13 PM] 
+If we want to be totally legit about this, we should probably move to MongoDB
+
+3lfist [3:13 PM]
+Right man.
+
+3lfist [3:13 PM]
+It's a limitation for sure
+
+3lfist [3:13 PM]
+Firebase was a quick solution
+
+nodeendo [3:13 PM] 
+okay well for now lets stick with firebase until it's time for the switch cause it's a good model i suppose
+
+nodeendo [3:14 PM]
+to get the client working
+
+3lfist [3:14 PM] 
+Right. The data structure is the same as Mongo. JSON object
+
+3lfist [3:14 PM]
+In fact Firebase is run on MongoDB
+
+3lfist [3:15 PM]
+Why exactly do you want to control the data on the server side?
+
+nodeendo [3:16 PM] 
+what I didn't realise until a day or 2 ago was  when you said to try to keep the database as flat as possible, then it kinda clicked and reminded me of when I was reading about the difference between flat-file db and relational db (sql) back in '05
+
+nodeendo [3:16 PM]
+it'd speed things up less processing for the clients to do
+
+nodeendo [3:17 PM]
+plus right now there's a security issue where someone can have access to e-mail addresses registered with Todolog just by knowing the username
+
+nodeendo [3:17 PM]
+they could capture it from the loopback code
+
+nodeendo [3:17 PM]
+plus all the database paths are public
+
+3lfist [3:17 PM] 
+you can use Firebase rules to keep things secure
+
+nodeendo [3:17 PM] 
+with firebase
+
+3lfist [3:18 PM] 
+https://www.firebase.com/docs/security/guide/ (edited)
+
+nodeendo [3:18 PM] 
+oh okay cool, good to know.
+
+3lfist [3:21 PM] 
+yeah that is how to keep things secure. i mentioned this earlier but not in detail
+
+nodeendo [3:23 PM] 
+like, when a user log's in by just providing a username Firebase echo's back the e-mail address associated with that username back to the client.... if someone wanted to find out a users e-mail address they would just have to edit their Todolog client to alert the variable $rootScope.email_loopback;
+
+nodeendo [3:23 PM]
+but that's about it
+
+-----------------------------------------------------------------------------------------------------------------------
+
+3lfist [5:28 PM] 
+ok checked how data is added
+
+3lfist [5:32 PM]
+i'm concerned about the loopback object. the uid2usr object is containing the UID objects neatly but one level up from the uid2usr object is a potential chaotic situation with thousands/millions of username objects. we have to avoid that hell. lets put those username objects in an object named 'users'.
+
+3lfist [5:35 PM]
+also there is no reason to have a 'username' key whose value is the username because the containing object key name is in fact the username. e.g.
+
+3lfist {email: '3lfist@gmail.com', uid:'94ec91f3-b08c-4f84-a439-4889a1334b21', username: '3lfist'}
+
+3lfist [5:36 PM]
+3lfist = object name and username = 3lfist
+
+3lfist [5:38 PM]
+also I still don't understand why loopback is even needed. it is an extra object potentially containing thousands/millions of UIDs and user objects
+
+3lfist [5:40 PM]
+This is what you wrote 
+>In order for  the end-user to be enabled to login using a user name using the Firebase "E-mail & Password" provider, it has to retrieve the e-mail that was registered with that username during signup. So what's happening is when the end-user  enters a string in the that's not in e-mail format into the Username or E-mail text field in the login form, it queries ("https://todolog.firebaseio.com/loopback/"+$rootScope.username+"/") and retrieves the value stored in [loopback->$rootScope.username->'e-mail'].... If $rootScope.username was = to "NodeEndo" it'd return "nodeendo@gmail.com" and then login using the traditonal "E-mail & Password" authentication method... you see..
+>And when someone logs in supplying their actual E-mail address instead of a Username it does the usual  login but still needs to find the Username associated with that account, the only way to do it is by using the querying ("https://todolog.firebaseio.com/loopback/uid2usr/"+$rootScope.uid+"/username/")
+>because when using the E-mail & Password authentication method the only thing that can link an account with it's data is it's UID....
+
+3lfist [5:44 PM]
+To me the top level ?*accounts*? object should contain user objects whose names are the actual usernames. e.g. 3lfist, nodeendo
+
+3lfist [5:45 PM]
+no offense on not capitolizing your usernames but I think usernames should be all lowercased unless you have a compelling argument against that rule
+
+3lfist [5:47 PM]
+most systems and apps do not allow for usernames with capital letters. i'm not sure why but i'm sure there is a good reason behind it. i don't want to go against that convention
+
+3lfist [5:49 PM]
+usernames should be able to have  letters, underscores and numbers. simpler the better is what i'm thinking
+
+3lfist [5:51 PM]
+ok done with the username tangent. now to get back on track.
+
+3lfist [5:53 PM]
+so ?*accounts*? contain objects whose names are actual usernames e.g. 3lfist, nodeendo and those objects contain the user's:
+
+?*email*?, ?*uid*?, ?*password*?, ?*social-account*?, ?*todos*?, ?*done*? (edited)
+
+3lfist [5:55 PM]
+so it would look like this:
+
+todolog {
+   accounts {
+        3lfist {
+             email: "3lfist@gmail.com",
+             password: "fh8934f#$F(J#F)#3jr934jr394rj",
+             uid : "94ec91f3-b08c-4f84-a439-4889a1334b21",
+             todos : {...},
+             done : {...}
+        }
+    }
+}
+
+
+3lfist [5:59 PM]
+actually maybe we would not have the ?*todos*? and ?*done*? objects because having those might not be keeping things flat enough
+
+3lfist [5:59 PM]
+to me that is more elegant and simple.
+
+nodeendo [7:12 PM] 
+I think we should just move forward at this point, we can always change the path's later on.... I know that the way data on forge looks linear, however it's deceptive because I'm using AngularFire's .once() selectors that just poke for the data it's looking for and doesn't seek the entire list.
+
+nodeendo [7:19 PM] 
+We can't let this hold us back from making progress.
+
+nodeendo [7:25 PM] 
+I honestly don't think you need to be concerned about the way the datastructure is currently set up when it comes to efficiency/speed/stability....
+
+nodeendo [7:27 PM]
+believe me, I've put a lot of thought into all those topics while creating what we have currently.
+
+nodeendo [1:09 AM] 
+"To me the top level ??*accounts*?? object should contain user objects whose names are the actual usernames. e.g. 3lfist, nodeendo" I wish we could do that but the problem is that no matter what you need to use a UID at the end because otherwise somone that has the name 3lfist on google could hop onto someone elses 3lfist facebook account.
+
+nodeendo [1:12 AM]
+the UID is unique across all providers (E-mail & Password, Google & Twitter) but we both agreed that it's to cryptic to use just the UID as the top level so I prepended the Username in front of the UID. so that now 3lfist-394-23fsdf-0w-32023 google account would be separate from 3lfist-5453-34jdklsj23-4353jlkf Twitter....
+
+3lfist [6:07 PM] 
+no that is fine but I want to understand you better. you wrote a lot of stuff and i just have these questions. i want us to talk so you can explain it and i can just ask questions in realtime. writing is too time consuming.
+
+3lfist [6:11 PM]
+progress is being made. it's just that i want to understand and make sure its the best route. i've never worked on this scope of a project with you so i need to be sure that this is the most elegant solution. i need to truly understand your argument for why it has to be this way. when you explain it in text, it's hard to understand and i have questions. if we are talking, i can just go through all of this and shoot off questions.
+
+3lfist [6:13 PM]
+like you said that usr2uid is separate from loopback but its not. the user2uid object is an objected nested in the loopback object. so there is this confusion happening here that i think a realtime convo will clear up.
+
+3lfist [6:26 PM] 
+i understand you want to make it so its faster.
+
+3lfist [6:26 PM]
+me too.
+
+3lfist [6:27 PM]
+but i think with my data structure example (minus the todo and done objects) it will be fast too. let's just talk.
+
+nodeendo [10:44 PM] 
+I'm cool with that, it's just I have a difficult time explaining things vocally because it takes me awhile to think through what I'm going to say...
+
+nodeendo [10:47 PM]
+You're right user2uid is inside the loopback I made a mistake by saying it was separate from loopback, I meant to say there was a reason why user2uid is separate from the username->email:'email@email.com'
+
+nodeendo [10:51 PM]
+it's actually uid2usr not usr2uid makes a difference
+
+nodeendo [1:56 AM] 
+just letting you know that any lag you experience with any form of Firebase authentication is not due to this way of exchanging data, because even with a pure E-mail & password authentication without the loopback we'd still experience that delay, for example the password reset e-mail request and the password change both experience the same delay and the exchange of data with those is pure direct Firebase methods with no loopback involved, direct connect, but there's still that delay.... not due to my programming
+
+
+nodeendo [5:27 PM] 
+fb_auth_loop.loopback(this.username).then(function(onSuccess){
+                                $rootScope.username=onSuccess.username;//Assign the 'username' value temporarily to global.username
+                                $rootScope.email_loopback=onSuccess.email;//Assign the retrieved 'email' & temporarily to global.email
+                                //Use the 'fb_login_hndl' (login handle) service while executing it's login() method, passing appropriate params.
+                                fb_login_hndl.login($rootScope.email_loopback,$rootScope.pass).then(function(onSuccess){
+                                    $rootScope.logged_stat=onSuccess.stat;
+                                    $rootScope.uid=onSuccess.uid;
+                                    if(onSuccess.stat){//Check the Username login status, if it's true...
+                                        login_success();
+                                        $rootScope.uid=($rootScope.username.replace(/\s/g,'_')+'-'+$rootScope.uid);
+                                        $scope.$apply($location.path('todolog'));
+                                        
+                                    }else{//Else, if it's false...
+                                        $scope.$apply($location.path('login'));
+                                    }
+                                });
+                            });
+
+nodeendo [5:29 PM]
+app.service("fb_auth_loop", ["$rootScope", "$q", function($rootScope, $q){
+        this.loopback=function(username,uid){
+            var defer=$q.defer();
+            $rootScope.loopback_ref=new Firebase('https://todolog.firebaseio.com/loopback/'+username+'/');
+            //$rootScope.loopback_ref=new Firebase('https://todolog.firebaseio.com/loopback/'+uid+'/');
+            $rootScope.loopback_ref.once("value",function(data_ret){
+                var tmp_obj=data_ret.val();
+                if(tmp_obj==null){
+                    feedback("You've entered incorrect Username, E-mail and/or Password credentials.",'login','e');
+                }else{
+                    defer.resolve(tmp_obj);
+                }
+            });
+            return defer.promise;
+-----------------------------------------------------------------------------------------------------------------------
+[Illustrated Explaination]: https://github.com/NodeEndo/todolog/notes/fb_screenshots/todolog_LOOPBACK_Explaination.png
+
+3lfist [2:07 PM]
+I think we should move to full on NodeJS Express JS server coupled with MongoDB. You know. The full MEAN stack (MongoDB, ExpressJS, AngularJS & NodeJS) What do you think?
+
+3lfist [2:07 PM]
+I'm so pissed
+
+3lfist [2:07 PM]
+Then again, this is ok
+
+3lfist [2:09 PM]
+We need to extend what this app can do to provide the best UX for the end user. Additionally your skill set would expand and you'd be more powerful. On the surface this is a pain in the butt but in truth, moving to a full MEAN stack app is the best thing we can do. What do you think?
+
+nodeendo [4:12 PM] 
+k i'm gonna maybe consider learning those other technologies
+
+nodeendo [4:14 PM]
+what is wrong with finishing the app with firebase and then make the switch?
+
+nodeendo [4:17 PM]
+i think we should finish what we have going right now with firebase while it's fresh in our minds and then once we've gotten the functionality down it'll keep me motivated to learn those other tech's because this is a huge tangent/fork you want to make and may screw up the workflow
+
+nodeendo [4:51 PM] 
+idk we need to continue progressing
+
+nodeendo [4:52 PM]
+I guess I can start integrating those other technologies while working on the interfacing
+
+3lfist [5:11 PM] 
+http://passportjs.org/ (edited)
+https://mongolab.com/
+https://aws.amazon.com/s3/
+https://aws.amazon.com/s3/pricing/
+https://cloud.google.com/products/
+http://expressjs.com/
+https://modulus.io/
+https://www.compose.io/
+
+3lfist [3:55 AM] 
+i'm just so glad we finally started collabing like this
+
+3lfist [3:56 AM] 
+well the truth is that if/when you learn MongoDB and Express and Node you will be much more in demand
+
+nodeendo [3:57 AM]
+true that's a good point
+
+3lfist [3:57 AM] 
+just having firebase under your belt, is something but the full MEAN stack makes you more valuable
+
+3lfist [3:57 AM]
+just keep that in mind. yeah
+
+nodeendo [3:57 AM] 
+true, versitility
+
+3lfist [3:58 AM] 
+yeah well i'm hoping todolog will take off but if not at least it will be a portfolio piece we could show potential clients
+
+3lfist [3:58 AM]
+so no matter what, we win.

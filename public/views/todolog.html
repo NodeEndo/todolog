@@ -1,0 +1,75 @@
+<div id="welcome">
+<ul style="list-style-type:none;">
+	<li class="inline"><img id="profile_img" src="{{profileImageURL}}"/></li>
+	<li class="inline">Welcome:</li><li class="inline">{{username}}</li>
+</ul>
+</div>
+<div ng-controller="main_ctrl as main">
+<div class="todo-ui block">
+<form name="todo_ui_frm" class="form-group" ng-controller="edit_ctrl as edit" ng-submit="todo_ui_frm.$valid && edit.add(main)" ng-validate="novalidate">
+	<ul class="neg_ws" > 
+		<li class="lrg_input neg_ws"><input type="text" name="add_todo" ng-model="edit.temp.label" class="form-control" ng-controller="placeholder_ctrl" placeholder="" required/></li>
+		<li class="small_btn neg_ws"><input type="submit" value="+ Add Todo" class="form-control"/></li>
+		<br>
+	</ul>
+</form>
+<hr></hr>
+</div>
+
+<div class="list-group">
+<label>Saved</label>
+<!--<div class="list-item" style="display:inline-block;" ng-repeat="months in main.save">-->
+<div class="list-item" id="save" ng-repeat="days in main.days | orderBy:'index' ">
+	<div style="display:inline-block; margin:0px; padding:0px; border-style:dashed; border-color:rgb(150,150,0); width:50%;">
+		<div style="display:block;">
+		<span style="color:rgb(0,255,0);">Todos:</span>
+		<div class="list-item" style="display:inline-block; border-style:solid; border-width:2px; border-color:rgb(0,255,0); margin:5px;" id="saved_item" ng-repeat="todos in days.todos">
+		{{todos.label}}<span> [index:{{todos.index}}]</span>
+		</div>
+		</div>
+		<div style="display:block;">
+		<span style="color:rgb(150,0,150);">Done:</span>
+		<div class="list-item" style="display:inline-block; border-style:solid; border-width:2px; border-color:rgb(150,0,150); margin:5px;" id="saved_item" ng-repeat="done in days.done">
+		{{done.label}}<span> [index:{{done.index}}]</span>
+		</div>
+		</div>
+	</div>
+	<div style="display:inline-block; margin:0px; padding:0px;">
+	<ul style="list-style-type:none;">
+		<li>[save_index:{{days.index}}]</li>
+		<li><a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.edit(main, days)">Edit</a></li>
+		<li><a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.remove(main, days,'days_item')">Remove</a></li>
+	</ul>
+	</div>
+</div><!--Day-->	
+<!--</div>--><!--Month-->
+
+<div style="display:block; margin:0px; padding:0px;">
+	<ul style="display:inline-block; list-style-type:none;">
+		<li>[page_index:{{page_index}}]</li>
+		<li class="inline"><a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.date('back')">Back</a></li>
+		<li class="inline"><a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.date('next')">Next</a></li>
+	</ul>
+</div>
+</div>
+<hr></hr>
+<div class="list-group" style="display:block;">
+	<label>Todos</label>
+	<div class="list-item" id="todos" ng-repeat="todo in main.todo | orderBy:'index' ">
+		<a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.done(main,todo)">Done</a>
+		{{todo.label}}<span> [index:{{todo.index}}]</span>
+	</div>
+</div>
+<hr></hr>
+<div class="list-group">
+	<label>Done</label>
+	<div class="list-item" ng-repeat="done in main.done | orderBy:'timestamp' ">
+		<a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.undo(main,done)">Undo</a>
+		{{done.label}}<span> [index:{{done.index}}]-[timestamp:{{done.timestamp|date:'medium'}}]</span>
+		<a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.remove(main,done,'done_item')">Remove</a>
+	</div>
+</div>
+<div>
+		<a class="btn btn-default" ng-controller="edit_ctrl as edit" ng-click="edit.save(main)">Save</a>
+</div>
+</div>

@@ -1,0 +1,52 @@
+3lfist [5:05 AM] 
+yes. having the accounts object  with the nested username objects seems to make more sense but I'm wondering what's the advantage of the ugly UID. Firebase devs must have put that in for a purpose and I'm trying to understand what it is.
+
+
+
+3lfist [5:10 AM]
+here is a Firebase best practices guide for structuring data. this will make the app faster so that is key to great UX https://www.firebase.com/docs/web/guide/structuring-data.html
+
+
+
+3lfist [5:33 AM] 
+Also there is this article about querying. Perhaps you know the methods in there? Not sure. Here it is anyways. https://www.firebase.com/blog/2014-11-04-firebase-realtime-queries.html
+
+
+
+3lfist [5:34 AM] 
+And maybe this is overkill but found this as well https://www.airpair.com/firebase/posts/structuring-your-firebase-data
+
+
+
+nodeendo [3:00 PM] 
+oh okay, well it's to make accounts data private, when one registers an account with firebase the return value is a UID property in a JSON object, and every time someone authenticates with firebase they receive the UID associated with that account again to access the data stored under it.... it's a privacy thing.
+
+
+
+nodeendo [3:22 PM] 
+I mean, having a UID is the only way to associate a user's login with their data.
+
+
+
+nodeendo [3:30 PM] 
+Last night I tried creating a 'save' array just like the 'todo' & 'done' however what it does is push/$add() the entire current 'todo' array into the 'save' array. so now I'm confident that firebase can handle multidimentinal arrays but only with $firebaseArray() service... which is what I've been using for the 'todo' and 'done' array.... in order to find data within the array I use something like path.save.indexOf(data); to find/query the location/index of the data.... without needing to know the exact key since they're dynamically rendered using the $firebaseArray() service... to delete an item I use the somthing like path.save.$remove(index_val); $remove() is a service just like $add associated with $firebaseArray().
+
+nodeendo [3:32 PM]
+When you can, I need to see that mockup again that you had on google drive.... the one with custom background images and the UI interface, so I know what I'm aiming for.
+
+
+
+nodeendo [3:36 PM]
+I'm limited to using $firebaseArray() to manage JS arrays on firebase... not only is it highly recommended but I've tried pushing generic JS arrays onto firebase and it's not really possible due to indexing issues.
+
+
+
+nodeendo [3:52 PM] 
+the $add service/method is equivlent to JS's array.push(data), the $remove sevice/method  is equivlent to JS's array.splice('value',index); but it does query that data in firebase in realtime.... using $add/$remove.... When I know specific key's I use the firebase_reference.once() wrapped inside of a custom created service that's injects/passes the '$q' service to create a resolve/promise in order to return data/(a promise) to determine when the firebase_reference.once() query has completed it's query which triggers the '.then()' that comes after/follows the service call passing the return value....
+
+This is the only way to force Asynchronous data processing to be more sequential otherwise it'd never  process the app with traditional order in which program code is executed. What would happen is the JS code would execute usally before the firebase_reference.once() query has completed except if you used something like setTimeout or an alert magically paused normal JS execution until the data has been received by firebase_reference.once().
+
+
+
+nodeendo [4:00 PM] 
+I'm going to check out those articles you're recommending to see if there are better options :simple_smile:

@@ -1,0 +1,33 @@
+so all you have to do now is to get rid of the Todo Categories: title up top
+and all the UI associated with Todo interface
+i mean all UI associated with category interface
+and just have:
+a text field with a label above it called "Todo"
+a submit button below
+that is the whole app when a user first gets to page
+then a user types in a todo name and pressed submit. after pressing submit the todo name appears below the text field and submit button
+
+[Moqups.com]=========================================================
+URL:https://moqups.com/3lfist@gmail.com/OaqIpsIe/p:afdcfd241
+
+so there is that header with Todolog title logo
+then you see the text field with the place holder text 'write todo here'
+and then there is a bottom border on the header DIV
+
+you see that light gray bottom border
+ok so that divides the Add Todo UI Header bar from the todo list
+The Todos list shows up under the Todo title
+you can see that
+
+When you hover over a todo the DONE button appears and the background highlites
+when user click Done button, the todo will disappear from the Todo list and appear in the Done list. The Done list appears below the Todo list and is separated by thin gray line. you can see it
+
+so when you hover over a todo that is in the done list, you'd see a delete button show up
+but that is not how the delete UI should appear
+what if a user by accident presses Done button. how do they get that todo back into the Todo list?
+there has to be an Undo button
+see?
+
+so if a user hovers over a Done todo, its background turns light gray and an Undo button appears
+see it?
+When the user clicks Undo button, the todo will disappear from the Done list and reappear in the Todo list at the bottom

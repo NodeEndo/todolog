@@ -1,0 +1,167 @@
+#welcome{
+	margin:0px;
+	padding:0px;
+	font-size:2em;
+}
+#msg_box_txt{
+	font-size:2em;
+}
+#signup-opt{
+	width:100%;
+}
+#profile_img{
+	float:right;
+	margin:0px;
+	padding:0px;
+	width:50px;
+	height:50px;
+}
+#third-party{
+	width:260px;
+	height:75px;
+}
+#forgot_btn{
+	color:rgb(0,0,125);
+}
+#forgot_btn:hover{
+	color:rgb(0,0,225);
+}
+.div-half{
+	height:100%;
+	width:40%;
+}
+.login-ui{
+	width:650px;
+	height:260px;
+}
+.txt-right{
+	text-align:right;
+}
+.txt-decor{
+	cursor:pointer;
+	color:rgb(0,0,255);
+	text-decoration:underline;
+}
+.txt-center{
+	text-align:center;
+}
+.btn-lrg{
+	float:right;
+	width:250px;
+}
+.wrap_txt{
+	white-space:normal;
+}
+.msg_box{
+	white-space:normal;
+	display:block;
+	position:absolute;
+	top:15%;
+	left:35%;
+	width:400px;
+	height:200px;
+	z-index:1;
+	background-color:rgb(200,200,200);
+	border-radius:5px 5px 5px 5px;
+}
+.vr{
+	margin-left:50%;
+	width:2px;
+	background-color:rgb(100,100,100);
+	height:110px;
+}
+.li_neg_margin>li{
+	margin:0px;
+	padding:0px;
+}
+form[name='reset_ui_frm']{
+	width:335px;
+	height:360px;
+}
+form[name='login_ui_frm']{
+	width:360px;
+	height:360px;
+}
+form[name='signup_ui_frm']{
+	width:335px;
+	height:360px;
+}
+form[name='settings_ui_frm']{
+	width:335px;
+	height:360px;
+}
+form[name='todo_ui_frm']>ul>li{
+	display:inline-block;
+	float:left;
+}
+.logo{
+	display:block;
+	cursor:pointer;
+	color:white;
+	background-color:grey;
+}
+//Selects all 'input' elements that end with "pass_input" e.g(login_pass_input)
+input[id$="pass_input"]{
+	width:250px;
+}
+#root_ui{
+	margin-left:70%;
+	white-space:nowrap;
+	width:100px;
+}
+.f_left{
+	float:left;
+	margin:0px;
+	padding:0px;
+}
+#splash_ui{
+	background-color:rgb(150,50,150);
+	width:300px;
+	height:400px;
+}
+.inline{
+	display:inline-block;
+}
+
+.ng-dirty.ng-valid{
+	border-color:green;
+}
+.ng-dirty.ng-invalid{
+	border-color:red;
+}
+.block{
+	margin:0px;
+	padding:0px;
+	float:right;
+	display:block;
+	width:100%;
+	text-decoration:none;
+}
+.li_block>li{
+	display:block;
+	margin:0px;
+	padding:0px;
+}
+.lrg_input{
+	width:50%;
+}
+.neg_margin{
+	margin:0px;
+	padding:0px;
+}
+.neg_ws{//Negate White-space
+	margin:0px;
+	padding:0px;
+	white-space:nowrap;
+	list-style-type:none;
+}
+#footer{
+	float:right;
+	display:block;
+	width:100%;
+	height:100px;
+}
+.todo-ui{
+	width:100%;
+	height:75px;
+}

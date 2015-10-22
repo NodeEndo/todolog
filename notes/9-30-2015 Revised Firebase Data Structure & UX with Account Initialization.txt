@@ -1,0 +1,330 @@
+---------------------------------------
+ADDITIONS: UX (User Experience) Features 
+---------------------------------------
+[Changed Login Layout]:
+The end-user is now greeted with the choice
+to either login using an existing social media
+account (Facebook, Google, or Twitter) on
+the left, or via a registerd Todolog
+username/E-mail & password on the right.
+---------------------------------------
+["Keep me signed in" Checkbox]:
+If the end-user/client chooses to login using
+a registered Todolog account, they are now given
+the option to choose how they want there login
+session to expire.
+
+When checked-off or enabled it sets the
+'remember' property inside the 'authWithPassword()'
+method equal to 'default' which uses the default
+24 hour lease configured in the Firebase settings. It
+will keep the login session active for 24 hours even if the end-user 
+decides closes the browser window before explicitly clicking the 
+'logout' button. 
+
+If the checkbox is left unchecked it sets the 'remember' 
+property equal to 'sessionOnly' which only keeps the login session
+active until either the end-user closes out of the browser
+window/tab, or clicks the 'logout' button.
+---------------------------------------
+[Social Media Initialization Prompt]:
+Checks to see if a Todolog account already exists for
+a end-users'/clients' social media account login, if not... it displays
+a message box containing a message:("Your Facebook account "Node Endo" 
+is currently not connected to Todolog.") along with a choice to either "Cancel"
+or "Sign up to Todolog via Facebook", Facebook is the provider in this example.
+---------------------------------------
+
+3lfist [4:40 AM] 
+I'm looking at the Forge data and it seems like the data there was added at different times during the dev process. I mean that is obvious.  I see data (of the same structure) being repeated in two places. Look at the 'accounts>3lfist' object and the 'loopback>NodeEndo' object. They have the same data represented. So it makes me think one of them should be killed off.
+
+3lfist [4:42 AM]
+I think this is a topic we should definitely talk about though. How about later today after 4pm EST? For me it would be 9 -10pm
+
+3lfist [5:06 AM] 
+Backing up a bit. In a basic app with Email & Password signup, the data structure has its top level full of UIDs. And we did not want this because the top level would be disorganized with potentially millions of UIDs. So inorder to organize that it seems like you created 'todolog.firebaseio.com/loopback/uid2usr' to house them. I totally understand that.  What do you think about changing 'todolog.firebaseio.com/loopback/' to 'todolog.firebaseio.com/accounts/' and in ''todolog.firebaseio.com/accounts/' putting 2 objects in there called 'uid2usr' and 'usernames'.  In the 'usernames' object will be objects whose keys are the actual username so I feel there is no need to even repeat it as the key/value store e.g. username : "3lfist". Instead the username object would just contain the UID and email key/value stores
+
+3lfist [5:06 AM]
+We can talk about it later but that is my thinking right now. Hope to talk later!
+
+3lfist [2:56 PM] 
+Hey. I guess you are on now.
+
+3lfist [2:57 PM]2:57
+And will be joining in Slack soon hopefully
+
+3lfist [2:58 PM]
+hi
+
+3lfist [2:58 PM]
+I thought so :simple_smile:
+
+3lfist [2:58 PM]
+How long will you be on for?
+
+nodeendo [3:00 PM] 
+hey
+
+nodeendo [3:01 PM]
+just got on
+
+nodeendo [3:01 PM]
+I just finished reading your thoughts on the data structure, not sure exactly what you're asking for yet I have to see if what you want is possible,
+
+3lfist [3:02 PM] 
+Ok I guess it's hard to explain.
+
+nodeendo [3:03 PM] 
+the reason why I have a the loopback section is because I was concerned about speed/traffic/usage for people logging in, wanted to keep it separate from accounts...
+
+nodeendo [3:04 PM]
+but there are also reasons why uid2usr is separate from the Loopback->NodeEndo->E-mail... because, with Loopback->NodeEndo->E-mail is when the username is provided by the end-user at login but the e-mail needs to be known to actually do an E-mail & Password authentication.
+
+nodeendo [3:05 PM]
+it basically asks here's the Username now I need the e-mail then log in with E-mail & password
+
+nodeendo [3:06 PM]3:06
+the  uid2usr section is when the user logs in by providing the actual e-mail and password but the username is unknown..... thats why it does a uid2usr because at that point the only known identifier is the UID
+
+3lfist [3:07 PM] 
+When I look at the forge right now, I feel like I am looking at chaos. Like all that data was added at different times of the dev process. You know?
+
+nodeendo [3:08 PM] 
+the Accounts->(Username+uid)->data is to identify the data unique to that one users account, the Username is added to the UID as a way to make it more legible to one looking at the database entries
+
+nodeendo [3:08 PM]
+oh okay, well I havent deleted your data,
+
+nodeendo [3:08 PM]
+I left it up so you can compare...
+
+nodeendo [3:08 PM]
+you're still using the old config
+
+3lfist [3:09 PM] 
+Can we kill all the data in it and start from scratch?
+
+nodeendo [3:09 PM] 
+yeah
+
+3lfist [3:09 PM] 
+Once you push the new version
+
+nodeendo [3:09 PM] 
+yup
+
+nodeendo [3:09 PM]
+:simple_smile:
+
+nodeendo [3:09 PM]
+i was just about to say that...
+
+3lfist [3:09 PM] 
+Good. When will you be pushing?
+
+3lfist [3:09 PM]
+haha
+
+nodeendo [3:09 PM] 
+tonight a new version should be pushed
+
+nodeendo [3:10 PM]
+I have one trello task I'm going to work on today and that's making the login layout and also the password reset look better
+
+nodeendo [3:10 PM]
+the way you have in your moqups
+
+3lfist [3:10 PM] 
+Sweet. Ok so when that happens you can delete the pre-existing data and we can start populating it from scratch with new user signups and todos
+
+nodeendo [3:10 PM] 
+yup!
+
+nodeendo [3:10 PM]
+of course...
+
+3lfist [3:11 PM] 
+then I will be able to better understand the exact nature of the data structure.
+
+3lfist [3:35 PM]
+I've started working more on what the user will be presented after they sign up and sign in. I've also been working on the anatomy of a Todo.  Sketches mainly but will convert them to Google doc.
+
+nodeendo [3:37 PM] 
+nice
+
+3lfist [3:38 PM] 
+so what else has been going on?
+
+nodeendo [3:39 PM] 
+btw, the password reset route I named /reset because I figure there may be an option later on down the line to reset the e-mail address
+
+3lfist [3:40 PM] 
+I think /password-reset will make more sense to the end user. is there a reason you didnt want to use that?
+
+nodeendo [3:40 PM] 
+figure we could put both password reset and email reset in two separate div's only one interface would display when needed
+
+nodeendo [3:41 PM]
+that way we wouldn't have to create a separate file, I used jQuery .html() method to replace the contents of the password reset interface when displaying feedback and giving the option to signup
+
+nodeendo [3:41 PM]
+it's as if it has saparate views but reusing the same one
+
+nodeendo [3:44 PM]
+I also plan on eventually using better methods if available to handle the client data, I want to keep it as efficient clean as possible so that it's easier to manage future changes
+
+3lfist [3:47 PM] 
+the /password-reset/ route is only used when a user needs to reset their password.
+
+3lfist [3:48 PM]
+if a user wants to change their email they would just do that in their account settings provided they signed up via Email & Password method
+
+3lfist [3:49 PM]
+you know what I mean. This is what most experienced tech users will expect
+
+3lfist [3:50 PM]
+unfortunately UX design is a field that is not as creative as fine arts and there do exist a set of best practices that we have to adhere to if we want to create something people will want to use
+
+3lfist [3:51 PM]
+i understand your motivation to keep things simple though. it just wont work here
+
+nodeendo [3:53 PM] 
+oh alright sounds cool, the only thing is I named the route /reset/ instead of /password-reset/
+
+nodeendo [3:54 PM]
+okay
+
+nodeendo [3:57 PM]
+i see what you're saying, it's another perspective
+
+3lfist [4:02 PM] 
+well its the conformist perspective
+
+nodeendo [4:03 PM] 
+you don't have to worry that's how I have it set up actually exactly the way you wanted it on trello and the moqup's
+
+nodeendo [4:03 PM]
+just the route is called /reset instead of password-reset :stuck_out_tongue:
+
+3lfist [4:04 PM] 
+the term  'reset' in the web app world means a function that the server automatically takes care of
+
+nodeendo [4:04 PM] 
+okay i'll change it!! argg....
+
+nodeendo [4:04 PM]
+lol
+
+3lfist [4:06 PM] 
+when a user changes their email, they are doing it themselves. sure you can see it as them resetting their email, but people never use that term
+
+nodeendo [4:06 PM] 
+yeah
+
+3lfist [4:07 PM] 
+:smile:
+
+3lfist [4:08 PM]
+you see when you start to create your own ideas about how this app should be designed you are playing with UX fire
+
+3lfist [4:08 PM]
+and then you begin to waste time and mess up the app
+
+3lfist [4:08 PM]
+i am the UX master here. got it?
+
+nodeendo [4:08 PM] 
+well's it's an easy fix.
+
+3lfist [4:09 PM] 
+I AM THE MASTER~!!!!! OF UX !!!!!
+
+3lfist [4:09 PM] 
+I AMAMAMAMAMAMAMAM!!!
+
+3lfist [4:09 PM]
+JUST KIDDING!!! NO I A M NOT!!!!! !
+
+3lfist [4:09 PM]
+ok
+
+3lfist [4:09 PM]
+i'm done
+
+nodeendo [4:09 PM] 
+you->"I AM THE CREATOR!"
+
+nodeendo [4:09 PM]
+lol k
+
+3lfist [4:09 PM] 
+you are the creator
+
+3lfist [4:09 PM]
+you are the builder
+
+nodeendo [4:09 PM] 
+yeah
+
+3lfist [4:09 PM] 
+this is like 50/50
+
+nodeendo [4:10 PM] 
+yup you're the designer
+
+3lfist [4:10 PM] 
+can you believe I said that 'i'm conformist' ???
+
+3lfist [4:10 PM]
+are you going to tell polly?
+
+3lfist [4:10 PM]
+hahaah
+
+nodeendo [4:10 PM] 
+no
+
+3lfist [4:12 PM] 
+i dont care if you do
+
+3lfist [4:12 PM]
+i realize that UX is bullshit
+
+3lfist [4:12 PM]
+its a shitty field
+
+3lfist [4:12 PM]
+but for me it's easy
+
+3lfist [4:12 PM]
+i just see emerging patterns in the web/mobile app field and copy them
+
+3lfist [4:12 PM]
+and just apply them in diff ways
+
+3lfist [4:14 PM]
+i dont want to do this forever you know
+
+nodeendo [4:15 PM] 
+i think it's cool actually
+
+nodeendo [4:15 PM]
+like you have to put yourself in the clients shoes and see from their perspective
+
+nodeendo [4:16 PM]
+may be sort of boring though
+
+3lfist [4:16 PM] 
+its kind of fun but i like nature better
+
+3lfist [4:18 PM] 
+ok man, i'm out for now.
+
+nodeendo [4:18 PM] 
+k, I'll push the update by tonight send you the links on here
+
+3lfist [4:18 PM] 
+i can't wait for the new push
+
+3lfist [4:18 PM]
+:simple_smile: psyched for it.

@@ -1,0 +1,4 @@
+re-read the instructions. when any user gets to the app, there is a Add Todo button. When a user clicks that button a single text field appears where a user writes the todo title. below the text field is a Submit button. when a user presses the submit button, the todo is added to an unordered list as a <li>. next to each todo list item, there is an Edit and Delete button. When a user presses Edit, the same text field appears that was used to create the todo. The user can now edit the todo title. After the edits are made the user will click the Save button to save the changes. Once the Save button is clicked, the text field disappears and  only the todo list is shown. If the Delete button is pressed then the todo list item disappears and is deleted.
+
+3lfist [5:20 PM]
+hope that clarifies it

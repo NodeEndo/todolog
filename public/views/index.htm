@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html ng-app="todolog">
+<head>
+<base href="/">
+<script type="application/javascript" src="libs/jquery/dist/jquery.min.js"></script>
+<script type="application/javascript" src="libs/angular/angular.min.js"></script>
+<script type="application/javascript" src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+<script type="application/javascript" src="https://cdn.firebase.com/libs/angularfire/1.1.2/angularfire.min.js"></script>
+<!--<script type="application/javascript" src="http://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>-->
+<script type="application/javascript" src="libs/angular-route/angular-route.min.js"></script>
+
+<script type="application/javascript" src="js/base_func/base_func.js"></script>
+<script type="application/javascript" src="js/services/services.js"></script>
+<script type="application/javascript" src="js/controllers/controllers.js"></script>
+<script type="application/javascript" src="js/angularRoutes.js"></script>
+<script type="application/javascript" src="js/app.js"></script>
+
+<link rel="stylesheet" type="text/css" href="libs/bootstrap/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="libs/bootstrap-social/bootstrap-social.css"/>
+<link rel="stylesheet" type="text/css" href="css/styles.css"/>
+</head>
+<body>
+<div id="header">
+	<ul ng-controller="root_ctrl as root" class="li_block neg_ws">
+		<li ng-click="root.redir('splash')">
+			<h1 class="f_left logo">Todolog</h1>
+		</li>
+		<li>
+		<h4 class="f_left">[logged_stat]:{{logged_stat}}</h4>
+		</li>
+	</ul>
+</div>
+<div id="root_ui" ng-controller="root_ctrl as root">
+	<ul style="list-style-type:none;">
+		<li class="inline neg_ws root_ui_btn"><a type="button" class="btn btn-danger" ng-click="root.redir('login')">Login</a></li>
+		<li class="inline neg_ws root_ui_btn"><a type="button" class="btn btn-danger" ng-click="root.redir('signup')">Sign up</a></li>
+		<li class="inline neg_ws todo_ui_btn"><a type="button" class="btn btn-danger" ng-click="root.redir('settings')">Settings</a></li>
+		<li class="inline neg_ws todo_ui_btn"><a type="button" class="btn btn-danger" ng-click="root.redir('logout')">Logout</a></li>
+	</ul>
+</div>
+<!--<div id="view" ui-view></div>-->
+<div id="view" ng-view></div>
+<div id="footer">
+<ul class="nav nav-pills" ng-controller="menu_ctrl as menu">
+	<li ng-class="{active:menu.isActive(1)}" id='todolog_btn'><a ng-href="todolog" ng-click="menu.setActive(1)">Todolog</a></li>
+	<li ng-class="{active:menu.isActive(2)}"><a ng-href="about" ng-click="menu.setActive(2)">About</a></li>
+	<li ng-class="{active:menu.isActive(3)}"><a ng-href="blog" ng-click="menu.setActive(3)">Blog</a></li>
+	<li ng-class="{active:menu.isActive(4)}"><a ng-href="faq" ng-click="menu.setActive(4)">FAQ</a></li>
+	<li ng-class="{active:menu.isActive(5)}"><a ng-href="contact" ng-click="menu.setActive(5)">Contact</a></li>
+</ul>
+</div>
+</body>
+</html>

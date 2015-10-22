@@ -1,0 +1,29 @@
+<div class="settings-ui neg_margin">
+	<h2>Settings:</h2>
+	<div id="chgPassword_ui_frm">
+		<form name="chgPassword_ui_frm"  ng-submit="chgPassword_ui_frm.$valid && settings.changePassword()" ng-validate="novalidate">
+			<ul class="li_block">
+				<li><h4>Password Reset:</h4></li>
+				<li><p id="reset_feedback"></p></li>
+				<li><input type="text" id="email_input" ng-model="settings.email" class="form-control" placeholder="Please enter your Todolog E-mail address here." required/></li>
+				<li>
+				<ul class="neg_ws">
+					<li>
+					<ul class="neg_ws neg_margin fl_left">
+						<li class="inline"><input type="password" id="cur_pass_input" ng-model="settings.cur_pass" class="form-control" placeholder="Please enter your current or temporary Password here." required/></li>
+						<li class="inline"><button type="button" class="btn btn-default pull-right glyphicon glyphicon-eye-close"></li>
+						</ul>
+						</li>
+						<li>
+						<ul class="neg_ws neg_margin fl_left">
+							<li class="inline"><input type="password" id="new_pass_input" ng-model="settings.new_pass" class="form-control" placeholder="Please enter your new Password here." required/></li>
+							<li class="inline"><button type="button" class="btn btn-default pull-right glyphicon glyphicon-eye-close"></button></li>
+						</ul>
+						</li>
+						<li><input type="submit" value="Update Password" class="btn-success form-control"/></li> 
+					</ul>
+				</ul>
+			</ul>
+		</form>
+	</div>
+</div>
