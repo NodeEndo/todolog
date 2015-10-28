@@ -46,11 +46,11 @@ function validate_creds(username,password,done){
 			if(err){return done(err);}
 			if (!auth_data) {
 				console.log('Incorrect Username');
-				return done(null, false, { message: 'Incorrect username.' });
+				return done(null, false, {message:'username'});
 			}
 			if (!auth_data.validPassword(password)) {
 				console.log('Incorrect Password');
-				return done(null, false, { message: 'Incorrect password.' });
+				return done(null, false, {message:'password'});
 			}
 			console.log('Login Successful!');
 			return done(null, auth_data);
@@ -61,11 +61,11 @@ function validate_creds(username,password,done){
 			if(err){return done(err);}
 			if (!auth_data) {
 				console.log('Incorrect E-mail.');
-				return done(null, false, { message: 'Incorrect E-mail.' });
+				return done(null, false, {message:'email'});
 			}
 			if (!auth_data.validPassword(password)) {
 				console.log('Incorrect Password');
-				return done(null, false, { message: 'Incorrect password.' });
+				return done(null, false, {message:'password'});
 			}
 			console.log('Login Successful!');
 			return done(null, auth_data);
@@ -78,7 +78,7 @@ function validate_creds(username,password,done){
 passport.use(new GoogleStrategy({
 	clientID:process.env.GOOGLE_CLIENT_ID,
 	clientSecret:process.env.GOOGLE_SECRET,
-	callbackURL:'https://serene-tundra-1851.herokuapp.com/auth/google/callback'},function(accessToken, refreshToken, profile, done){
+	callbackURL:process.env.DOMAIN+'/auth/google/callback'},function(accessToken, refreshToken, profile, done){
 		static_id=profile.id;
 		static_provider='google';
 		static_photos=profile.photos;
@@ -90,7 +90,7 @@ passport.use(new FacebookStrategy({
 	profileFields:['id','displayName','photos'],
 	clientID:process.env.FACEBOOK_CLIENT_ID,
 	clientSecret:process.env.FACEBOOK_SECRET,
-	callbackURL:'https://serene-tundra-1851.herokuapp.com/auth/facebook/callback'},function(accessToken, refreshToken, profile, done){
+	callbackURL:process.env.DOMAIN+'/auth/facebook/callback'},function(accessToken, refreshToken, profile, done){
 		static_id=profile.id;
 		static_provider='facebook';
 		static_photos=profile.photos;
@@ -101,13 +101,14 @@ passport.use(new FacebookStrategy({
 passport.use(new TwitterStrategy({
 	consumerKey:process.env.TWITTER_CONSUMER_KEY,
 	consumerSecret:process.env.TWITTER_SECRET,
-	callbackURL:'https://serene-tundra-1851.herokuapp.com/auth/twitter/callback'},function(accessToken, refreshToken, profile, done){
+	callbackURL:process.env.DOMAIN+'/auth/twitter/callback'},function(accessToken, refreshToken, profile, done){
 		static_id=profile.id;
 		static_provider='twitter';
 		static_photos=profile.photos;
 		done(null,{provider:'twitter',id:profile.id,username:profile.displayName,photos:profile.photos});
 	}));
 //----------------------------------------------------
+
 //passport.use(new passportHttp.BasicStrategy(validate_creds));
 passport.use(new LocalStrategy(validate_creds));
 passport.serializeUser(function(user_data,done){
@@ -118,8 +119,9 @@ passport.serializeUser(function(user_data,done){
 	done(null,user_data.username);
 });
 passport.deserializeUser(function(username,done){
-	console.log('deserializing data');	
-	done(null,{provider:static_provider,uid:(username+'_'+static_id+'_'+static_provider),username:username,photos:static_photos});
+	console.log('deserializing data');
+	var uid_dsp_name=username.toLowerCase();	
+	done(null,{provider:static_provider,uid:(uid_dsp_name.replace(/\s/g,'_')+'_'+static_id+'_'+static_provider),username:username,photos:static_photos});
 });
 
 app.set('port',process.env.PORT || 8080);

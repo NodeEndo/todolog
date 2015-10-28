@@ -11,7 +11,7 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 		}).when('/login',{
 			url:'/login',
 			templateUrl:'views/login.html',
-			controller:["$scope", "$rootScope", "$location", "$timeout", /*"$firebaseArray", "fb_login_hndl", "fb_auth_loop", "fb_chk_acct", "fb_username","get_authData",*/ "togglePassword","passport", "http_post", function($scope, $rootScope, $location, $timeout, /*$firebaseArray, fb_login_hndl, fb_auth_loop, fb_chk_acct, fb_username,get_authData,*/ togglePassword,passport,http_post){
+			controller:["$scope", "$rootScope", "$location", "refresh", "togglePassword","passport", "http_post", function($scope, $rootScope, $location, refresh, togglePassword,passport,http_post){
 				$('#msg_box').hide();
 				this.persist=false;
 				var toggle_val=true;
@@ -22,7 +22,7 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 				$('#todolog_btn,.todo_ui_btn').hide();
 				$('.root_ui_btn').show();
 				if($rootScope.reg_stat){
-					feedback($rootScope.username+" was successfully registered!",'login','g');
+					feedback($rootScope.username+" was successfully registered. You can now log in!",'login','g');
 				}
 				togglePassword.target('login_pass');	
 				this.reset=function(what){
@@ -41,7 +41,6 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 				//Retrieve Profile Data
 				passport.parseAPI().then(function(onSuccess){
 					if(onSuccess.acct_exists){
-						//alert('Account Exists!');
 						$scope.$apply($location.path('todolog'));
 					}else{
 						$('#msg_box').slideDown(1000);
@@ -51,54 +50,9 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 				//Third-party Login Authentication (Google, Twitter, Facebook)
 				this.popup=function(provider){
 					passport.selectProvider(provider);
-					/*$rootScope.provider=(provider.charAt(0).toUpperCase()+provider.substr(1).toLowerCase());
-					$rootScope.provider_ref=new Firebase("https://todolog.firebaseio.com");
-					$rootScope.provider_ref.authWithOAuthPopup(provider, function(error, authData){
-						if(error){
-							if(error.code=="TRANSPORT_UNAVAILABLE"){
-								provider_ref.authWithOAuthRedirect(provider, function(error, authData){
-									if(error){
-										feedback("In your browser settings try enabling pop-up's.",'login','e');
-									}else{
-										get_authData.processAPI(provider,authData).then(function(onSuccess){
-											if(onSuccess.stat){
-											fb_chk_acct.user_exist(null,true).then(function(onSuccess){
-												if(onSuccess.exists){	
-													$scope.$apply($location.path('todolog'));
-												}else{
-												$('#msg_box').slideDown(5000);
-												}
-											});
-											}else{
-											$scope.$apply($location.path('login'));
-											}
-										});
-									}
-								});
-							}else{
-								feedback("You've entered either the wrong Username, E-mail or Password with "+(provider.charAt(0).toUpperCase()+provider.substr(1))+". Give it another go.",'login','e');
-							}
-						}else{
-							get_authData.processAPI(provider,authData).then(function(onSuccess){
-								if(onSuccess.stat){
-									fb_chk_acct.user_exist(null,true).then(function(onSuccess){
-										if(onSuccess.exists){	
-											$scope.$apply($location.path('todolog'));
-										}else{
-											$('#msg_box').slideDown(5000);
-										}
-									});
-									$('.msg_box').css('display','block');
-									//$scope.$apply($location.path('todolog'));
-								}else{
-									$scope.$apply($location.path('login'));
-								}
-							});
-						}
-					});*/
 				};
 				this.login=function(){
-					$rootScope.persist=this.persist;
+					//$rootScope.persist=this.persist;
 					feedback("Logging in with supplied credentials!",'login','g');
 					//Use JS RegEx to filter E-mail vailiation
 					var email_opt=/^[a-zA-Z0-9]{1,}\@[a-zA-Z]{2,}\.\D{2,}$/.exec(this.email);
@@ -112,65 +66,44 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 						}else{
 							feedback("Attempting to login with supplied Username..."+this.username,'login','g');
 							var login_serialized=("username="+this.username+"&password="+this.pass);
-							http_post.with_this('/login',login_serialized).then(function(onSuccess){
+							http_post.with_this('/login/'+this.persist,login_serialized).then(function(onSuccess){
 								if(onSuccess.data.success){
-									$timeout(function(){//After 1 milisecond, refresh the login page.
-									location.reload();
-									},1);
+									feedback("Successfully logged in!",'login','g');
+									refresh.page(1);//After 1 milisecond, refresh the login page.
 								}else{
-									$scope.$apply($location.path('signup'));
+									if(onSuccess.data.error){
+										switch(onSuccess.data.error_type){
+											case 'username':
+											feedback("There is no existing Todolog account with the Username:"+$rootScope.username+", Have you signed up?<a href='signup'>Click Here</a> if you haven't already.",'login','e');
+												break;
+											case 'password':
+												feedback("You've entered the wrong Password.",'login','e');
+												break;
+										}
+									}
 								}
 							});
-						
-							/*fb_auth_loop.loopback(this.username).then(function(onSuccess){
-								$rootScope.username=onSuccess.username;//Assign the 'username' value temporarily to global.username
-								$rootScope.email_loopback=onSuccess.email;//Assign the retrieved 'email' & temporarily to global.email
-								//Use the 'fb_login_hndl' (login handle) service while executing it's login() method, passing appropriate params.
-								fb_login_hndl.login($rootScope.email_loopback,$rootScope.pass).then(function(onSuccess){
-									$rootScope.logged_stat=onSuccess.stat;
-									$rootScope.uid=onSuccess.uid;
-									if(onSuccess.stat){//Check the Username login status, if it's true...
-										login_success();
-										$rootScope.uid=($rootScope.username.replace(/\s/g,'_')+'-'+$rootScope.uid);
-										$scope.$apply($location.path('todolog'));
-										
-									}else{//Else, if it's false...
-										$scope.$apply($location.path('login'));
-									}
-								});
-							});*/
 						}
 					}else{
 						feedback("Attempting to login with supplied E-mail...",'login','g');
 						var login_serialized=("username="+this.email+"&password="+this.pass);
-						http_post.with_this('/login',login_serialized).then(function(onSuccess){
+						http_post.with_this('/login/'+this.persist,login_serialized).then(function(onSuccess){
 							if(onSuccess.data.success){
-								$timeout(function(){//After 1 milisecond, refresh the login page.
-									location.reload();
-								},1);
+								feedback("Successfully logged in!",'login','g');
+								refresh.page(1);//After 1 milisecond, refresh the login page.
 							}else{
-								$scope.$apply($location.path('signup'));
+								if(onSuccess.data.error){
+									switch(onSuccess.data.error_type){
+										case 'email':
+											feedback("There is no existing Todolog account with the E-mail:"+$rootScope.username+", Have you signed up?<a href='signup'>Click Here</a> if you haven't already.",'login','e');
+											break;
+										case 'password':
+											feedback("You've entered the wrong Password.",'login','e');
+											break;
+									}
+								}
 							}
 						});
-
-						/*fb_login_hndl.login(this.email,this.pass).then(function(onSuccess){
-							$rootScope.logged_stat=onSuccess.stat;
-							$rootScope.uid=onSuccess.uid;
-							if(onSuccess.stat){//Check the E-mail login status, if it's true...
-								//Retreive value set to 'username' by using the 'fb_username.get_username(uid)' service method.
-								fb_username.get_username($rootScope.uid).then(function(onSuccess){
-									//The store the returned 'username' into 'global.username'
-									$rootScope.username=onSuccess.username;
-									login_success();
-									$rootScope.uid=($rootScope.username.replace(/\s/g,'_')+'-'+$rootScope.uid);
-									/*Since we're guarunteed to have extracted the 'username' 
-									Re-direct to the 'todolog' UI View.*/
-									/*$scope.$apply($location.path('todolog'));
-								});
-							}else{//Else, if it's false...
-								$scope.$apply($location.path('login'));
-							}
-						});*/
 					}
 				};
 				this.redir=function(){
@@ -214,7 +147,7 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 		}).when('/signup',{
 			url:'/signup',
 			templateUrl:'views/signup.html',
-			controller:["$scope","$rootScope","$location","$http", /*"$firebaseArray", "fb_chk_acct", "fb_signup",*/"togglePassword","http_post", function($scope, $rootScope, $location, $http, /*$firebaseArray, fb_chk_acct, fb_signup,*/ togglePassword, http_post){
+			controller:["$scope","$rootScope","$location","togglePassword","http_post", function($scope, $rootScope, $location, togglePassword, http_post){
 			this.username=null;
 			this.email=null;
 			this.pass=null;
@@ -246,27 +179,21 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 						var signup_serialized=("username="+this.username+"&email="+this.email+"&password="+this.pass);
 						http_post.with_this('/signup',signup_serialized).then(function(onSuccess){
 							if(onSuccess.data.success){
+								$rootScope.reg_stat=true;
+								feedback("YESSS... You have sucessfully registered and may now login!",'login','g');
 								$scope.$apply($location.path('login'));
 							}else{
+								if(onSuccess.data.error){
+									switch(onSuccess.data.error_type){
+										case 'exists':
+											feedback("Shucks the Username you wanted already exists... meditate on that one.",'signup','e');
+											break;
+									}
+								}
 								$scope.$apply($location.path('signup'));
 							}
 						});
 						
-						//Scan the 'accounts' DB table entry to see if the Username has already been taken.
-						/*fb_chk_acct.user_exist($rootScope.username).then(function(onSuccess){
-							$rootScope.user_exist=onSuccess.exists;
-							if($rootScope.user_exist==false){//If the 'Username' hasn't already been registered continue...
-								//Register account with 'fb_signup' Service by executing it's 'register_acct()' parameter...
-								fb_signup.register_acct($rootScope.username,$rootScope.email,$rootScope.password).then(function(onSuccess){
-								        $rootScope.reg_stat=onSuccess.reg_stat;
-									if(onSuccess.reg_stat){
-										$scope.$apply($location.path('login'));
-									}else{
-										$scope.$apply($location.path('login'));
-									}
-								});
-							}
-						});*/
 					}
 				};
 			}],
@@ -289,7 +216,7 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 		}).when('/settings',{
 			url:'/settings',
 			templateUrl:'views/settings.html',
-			controller:["$rootScope","togglePassword",function($rootScope,togglePassword){
+			controller:["$scope","$rootScope","togglePassword","http_post",function($scope,$rootScope,togglePassword,http_post){
 				this.email=null;
 				this.cur_pass=null;
 				this.new_pass=null;
@@ -298,30 +225,30 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 					$('#chgPassword_ui_frm').hide();
 				}
 				this.changePassword=function(){
-				var fb_ref=new Firebase("https://todolog.firebaseio.com");
+				//var fb_ref=new Firebase("https://todolog.firebaseio.com");
 				//Use JS RegEx to filter Password vailiation (At least 1:/^(Digit)(Low-Case)(Up-Case)[At Least 8 Letters or Numbers]$/)
 				var pass_valid=/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{9,}$/.exec(this.new_pass);
 				if(pass_valid==null){
 					feedback("Problem with Password formatting.\r\n Password requires at least 9 letters & or Numbers, it's manditory to use at least 1 Capital, 1 Lowercase and 1 Number.",'reset','e');
 					$('#new_pass_input').addClass('ng-dirty ng-invalid');
 				}else{
-					fb_ref.changePassword({
-						email:this.email,
-						oldPassword:this.cur_pass,
-						newPassword:this.new_pass
-					},function(onError){
-						if(onError==null){
+					var serialized_data=("&email="+this.email+"&cur_pass="+this.cur_pass+"&new_pass="+this.new_pass);
+					http_post.with_this('/change_password',serialized_data).then(function(onSuccess){
+						if(onSuccess.data.success){
 							feedback("Password Reset was Successful!",'reset','g');
+							$('#email_input,#cur_pass_input,#new_pass_input').val('');
 						}else{
-							switch(onError.code){
-								case 'INVALID_USER':
-									feedback("You've entered the wrong E-mail address. Give it another go.",'reset','e');
-									$('#email_input').addClass('ng-dirty ng-invalid');
-									break;
-								case 'INVALID_PASSWORD':
-									feedback("Your current password was entered incorrectly. Give it another go.",'reset','e');
-									$('#cur_pass_input').addClass('ng-dirty ng-invalid');
-									break;
+							if(onSuccess.data.error){
+								switch(onSuccess.data.error_type){
+									case 'email':
+										feedback("You've entered the wrong E-mail address. Give it another go.",'reset','e');
+										$('#email_input').addClass('ng-dirty ng-invalid');
+										break;
+									case 'password':
+										feedback("Your current password was entered incorrectly. Give it another go.",'reset','e');
+										$('#cur_pass_input').addClass('ng-dirty ng-invalid');
+										break;
+								}
 							}
 						}
 					});
@@ -332,13 +259,7 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 		}).when('/logout',{
 			url:'/logout',
 			templateUrl:'views/logout.html',
-			controller:["$rootScope", "$scope", "$location", "$timeout",function($rootScope,$scope,$location,$timeout){
-				if($rootScope.provider_ref!=null){
-				$rootScope.provider_ref.unauth();//Un-Authenticate from 3rd-party provider-based Firebase reference.
-				}else{
-					$rootScope.login_ref.unauth();//Un-Authenticate from E-mail & Password based Firebase reference.
-				}
-				$rootScope.logged_stat=false;
+			controller:["$rootScope", "$scope", "$location", "$timeout", function($rootScope,$scope,$location,$timeout){
 				$timeout(function(){//Pause for 2000 milliseconds or 2 seconds, then...
 					location.reload();//do a page refresh to reinitialize the entire App.
 					$scope.$apply($location.path('splash'));//The redirect to the Splash view.

@@ -62,7 +62,7 @@
 	//Output Feedback
 	function feedback(msg,target,type){
 		var msg_color={'e':'rgb(255,0,0)','g':'rgb(0,255,0)'};
-		$('#'+target+'_feedback').text(msg);
+		$('#'+target+'_feedback').html(msg).show();
 		$('#'+target+'_feedback').css('color',msg_color[type]);
 	}
 	//Actions to take directly after successful login.
