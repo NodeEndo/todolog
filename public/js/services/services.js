@@ -34,8 +34,8 @@ srv.service("persist",["$rootScope","$q","$http", "http_post",function($rootScop
 }]);
 
 srv.service("passport",["$rootScope", "$http", "$window","$location","$q",function($rootScope, $http, $window,$location,$q){
-	this.selectProvider=function(provider){
-		var trig_path=('/auth/'+provider);
+	this.selectProvider=function(provider,redir){
+		var trig_path=('/auth/'+provider+'?redir='+redir);
 		$window.location.href=trig_path;
 	};
 	this.parseAPI=function(){
@@ -48,15 +48,13 @@ srv.service("passport",["$rootScope", "$http", "$window","$location","$q",functi
 			$rootScope.profileImageURL=ret.data.profile.photos[0].value;//Profile Image
 			$rootScope.dynamic=ret.data.profile.dynamic;
 			defer.resolve({acct_exists:ret.data.acct_exists});//Display UX Login Prompt
-			$rootScope.logged_stat=true;
-			login_success();
 		});
 		return defer.promise;
 	};
 	this.initAccount=function(){
 		var defer=$q.defer();
 		$http.get('/create_acct').then(function(ret){
-			defer.resolve(ret);
+			defer.resolve(ret.data);
 		});
 		return defer.promise;
 	};

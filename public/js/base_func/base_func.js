@@ -67,6 +67,10 @@
 	}
 	//Actions to take directly after successful login.
 	function login_success(){
-	$('.root_ui_btn').hide();
-	$('#todolog_btn,.todo_ui_btn').show();
+		$('.root_ui_btn').hide();
+		$('#todolog_btn,.todo_ui_btn').show();
+	}
+	function base_menu(){
+		$('#todolog_btn,.todo_ui_btn').hide();
+		$('.root_ui_btn').show();
 	}

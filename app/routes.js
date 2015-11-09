@@ -1,4 +1,4 @@
-module.exports=function(app,passport,mongoose,bodyParser,auth_schema,acct_schema){
+module.exports=function(app,passport,mongoose,bodyParser,auth_schema,acct_schema,sendgrid){
 	function ensure_auth(req,res,next){
 		if(req.isAuthenticated()){
 			return next();
@@ -50,16 +50,11 @@ module.exports=function(app,passport,mongoose,bodyParser,auth_schema,acct_schema
 		acct_signup.uid=req.user.uid;
 		acct_signup.save(function(err){
 			if(err){
-				//next(err);
-				//var err_code=/\d*/.exec(err.substring(0,17));
-				/*console.log(err_code);
-				if(err_code===11000){*/
 				if(err.code==11000){
-				console.log('hmm...');
 				res.send({error:true, error_type:'exists'});//send the current error obj.
 				}
 			}else{
-				res.json({success:true});
+				res.send({success:true});
 			}
 		});
 	});
@@ -80,36 +75,102 @@ module.exports=function(app,passport,mongoose,bodyParser,auth_schema,acct_schema
 			}
 		});
 	});
-
-	app.get('/auth/google',passport.authenticate('google',{
+	var static_redir=null;
+	app.get('/auth/google',function(req,res,next){static_redir=('/'+req.query.redir); next()},passport.authenticate('google',{
 		scope:['https://www.googleapis.com/auth/plus.login',
 		'https://www.googleapis.com/auth/plus.profile.emails.read']}));
-	app.get('/auth/google/callback',passport.authenticate('google',{failureRedirect: '/login'}),
+	app.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:static_redir}),
 			function(req,res){
-				res.redirect('/login');
+				res.redirect(static_redir);
 			});
 
-	app.get('/auth/facebook',passport.authenticate('facebook'));
-	app.get('/auth/facebook/callback',passport.authenticate('facebook',{failureRedirect:'/login'}),
+	app.get('/auth/facebook',function(req,res,next){static_redir=('/'+req.query.redir); next()},passport.authenticate('facebook'));
+	app.get('/auth/facebook/callback',passport.authenticate('facebook',{failureRedirect:static_redir}),
 			function(req,res){
-				res.redirect('/login');
+				res.redirect(static_redir);
 			});
 
-	app.get('/auth/twitter',passport.authenticate('twitter'));
-	app.get('/auth/twitter/callback',passport.authenticate('twitter',{failureRedirect:'/login'}),
+	app.get('/auth/twitter',function(req,res,next){static_redir=('/'+req.query.redir); next()},passport.authenticate('twitter'));
+	app.get('/auth/twitter/callback',passport.authenticate('twitter',{failureRedirect:static_redir}),
 			function(req,res){
-				res.redirect('/login');
+				res.redirect(static_redir);
 			});
+	app.get('/verify',function(req,res){
+		auth_schema.findOne({username:req.query.username},function(err,auth_data){
+			if(err){
+				res.redirect('/verif_user');
+			}else{
+				if(!auth_data.validVerif(req.query.verif_code)){
+				res.redirect('/verif_code');
+				}else{
+					auth_data.lock_status=0;//Replace lock_status from '1'|on, to '0'|off.
+					auth_data.save(function(err){
+						if(err){
+							res.redirect('/verif_failed');
+						}else{
+							res.redirect('/verif_success');
+						}
+					});
+				}
+			}
+		});
+	});
+
+	app.post('/password-reset',parse_post,function(req,res){
+		auth_schema.findOne({email:req.body.email},function(err,auth_data){
+			if(!auth_data){
+				res.send({error:true,error_type:'INVALID_USER'});
+			}else{
+				var tmp_json=auth_data.resetPassword();
+				auth_data.salt=tmp_json.salt;
+				auth_data.hash=tmp_json.hash;
+				auth_data.save(function(err){
+					if(err){
+						res.send({error:true,error_type:'FAILED'});
+					}else{
+						var email=new sendgrid.Email();
+						email.addTo(req.body.email);
+						email.setFrom("no_reply@champ.com");
+						email.setSubject("So we heard you forgot your password for CHAMP, eh...?");
+						email.setHtml('This is your new temporary password:'+auth_data.salt+'<br><a href="'+process.env.DOMAIN+'/login">Click Here</a> to login using your temporary password, then go to your Settings and change to one that you\'d like.');
+						sendgrid.send(email,function(err,json){
+							if(err){
+								console.log(err);
+							}else{
+								console.log(json);
+							}
+						});
+						res.send({success:true});
+					}
+				});
+			}
+		});
+
+	});
 	app.post('/signup',parse_post,function(req,res,next){
 			var signup=new auth_schema();
 			signup.username=req.body.username;
 			signup.email=req.body.email;
+			signup.verif_hash=signup.setVerif(req.body.username);
+			console.log('verif_hash:'+signup.verif_hash);
 			signup.hash=signup.setPassword(req.body.password);
 			signup.save(function(err){
 				if(err){
 					res.send({error:true,error_type:'exists'});
 					return next(err);
 				}else{
+					var email=new sendgrid.Email();
+					email.addTo(req.body.email);
+					email.setFrom("no_reply@champ.com");
+					email.setSubject("Account Verification From CHAMP");
+					email.setHtml('<a href="'+process.env.DOMAIN+'/verify?username='+signup.username+'&verif_code='+signup.verif_hash+'">Click Here</a> to Verify your new CHAMP account.');
+					sendgrid.send(email,function(err,json){
+						if(err){
+							console.log(err);
+						}else{
+							console.log(json);
+						}
+					});
 					res.send({success:true});
 					//return res.json({token:signup.generateJWT()});
 				}
@@ -141,16 +202,21 @@ module.exports=function(app,passport,mongoose,bodyParser,auth_schema,acct_schema
 			if(!user){//If the user param, (the 2nd parameter) was set to false send error obj.
 				res.send({error:true, error_type:info.message});//send the current error obj.
 			}else{
-				return req.login(user,function(err){//Since we're using a custom callback function, it is required to manually invoke/execute a request.login() passing the user data as the 1st argument.
-					if(err){
-						return res.sendStatus(500);
-					}
-					done(null,user);//Now that we're logged the done(null,user) continues to the next express procedure, in this case invoking passport.serializeUser() in the '\server.js' file which parses the 'user' data and generates a cookie to maintain an active server-client session.
-				});
+				if(!user.lock_status){//If account has been Verified...
+
+					return req.login(user,function(err){//Since we're using a custom callback function, it is required to manually invoke/execute a request.login() passing the user data as the 1st argument.
+						if(err){
+							return res.sendStatus(500);
+						}
+						done(null,user);//Now that we're logged the done(null,user) continues to the next express procedure, in this case invoking passport.serializeUser() in the '\server.js' file which parses the 'user' data and generates a cookie to maintain an active server-client session.
+					});
+				}else{//If account has not been Verified, it's lock_status=1.
+					res.send({error:true, error_type:'locked'});
+				}
 			}
-		})(req,res,done)},function(req,res){
-			res.send({success:true});
-		});
+	})(req,res,done)},function(req,res){
+		res.send({success:true});
+	});
 
 	app.get('/logout',function(req,res,done){
 		req.logout();

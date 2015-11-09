@@ -1,5 +1,5 @@
 <div class="login-ui neg_margin neg_ws">
-<h2 style="text-align:center;">Sign In</h2>
+<h2 style="text-align:center;">Login</h2>
 <div id="msg_box" class="msg_box">
 	<p id="msg_box_txt">Your {{provider}} account "{{username}}" is currently not connected to Todolog.</p>
 	<ul>
@@ -7,7 +7,7 @@
 		<button class="btn btn-default inline" ng-click="login.cancel()">Cancel</button>
 		</li>
 		<li class="fl_left inline">
-		<button class="btn btn-success inline" ng-controller="root_ctrl as root" ng-click="root.redir('todolog')">Sign up to Todolog via {{provider}}</button>
+		<button class="btn btn-success inline" ng-controller="root_ctrl as root" ng-click="root.redir('signup',1)">Sign up to Todolog via {{provider}}</button>
 		</li>
 	</ul>
 </div>
@@ -17,17 +17,17 @@
 		<li><h4 class="txt-center">Via social account</h4></li>
 		<li>
 		<a class="btn btn-block btn-social btn-facebook" ng-click="login.popup('facebook')">
-			<i class="fa fa-facebook"></i> Sign in with Facebook 
+			<i class="fa fa-facebook"></i> Login with Facebook 
 		</a>
 		</li>
 		<li>
 		<a class="btn btn-block btn-social btn-google" ng-click="login.popup('google')">
-			<i class="fa fa-google"></i> Sign in with Google
+			<i class="fa fa-google"></i> Login with Google
 		</a>
 		</li>
 		<li>
 		<a class="btn btn-block btn-social btn-twitter" ng-click="login.popup('twitter')">
-			<i class="fa fa-twitter"></i> Sign in with Twitter
+			<i class="fa fa-twitter"></i> Login with Twitter
 		</a>
 		</li>
 	</ul>
@@ -39,7 +39,7 @@
 	</ul>
 </div>
 <div class="fl_left div-half inline neg_margin">
-		<form name="login_ui_frm"  ng-submit="login_ui_frm.$valid && login.login()" ng-validate="novalidate">
+	<form name="login_ui_frm"  ng-submit="login_ui_frm.$valid && login.login()" ng-validate="novalidate">
 		<ul class="li_block li_neg_margin">
 			<li><h4>Via E-mail</h4></li>
 			<li><p class="neg_margin">E-mail</p></li>
@@ -48,16 +48,15 @@
 			<li>
 			<ul class="neg_ws">
 				<li class="inline"><input type="password" id="login_pass_input" ng-model="login.pass" class="form-control" placeholder="Please enter your Password here." required/></li>
-				
+
 				<li class="inline"><button type="button" class="btn btn-default pull-right glyphicon glyphicon-eye-close">
 				</button></li>
 			</ul>
 			</li>
 			<li><label class="txt-decor"><input type="checkbox" ng-model="login.persist"></input>Keep me signed in</label></li>
-		<li><input type="submit" value="Sign in" class="btn-success form-control"/></li> 
-		<li><a class="btn btn-block form-control txt-right txt-decor" ng-click="login.reset('password')">Forgot your password?</a></li> 
-		
-	</ul>
+			<li><input type="submit" value="Sign in" class="btn-success form-control"/></li> 
+			<li><a class="btn btn-block form-control txt-right txt-decor" ng-click="login.reset('password')">Forgot your password?</a></li> 
+		</ul>
 	</form>
 </div>
 </div>

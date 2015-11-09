@@ -18,11 +18,13 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 				this.username=null;
 				this.email=null;
 				this.pass=null;
-				//$('#todolog_btn').hide();
-				$('#todolog_btn,.todo_ui_btn').hide();
-				$('.root_ui_btn').show();
+				base_menu();
 				if($rootScope.reg_stat){
-					feedback($rootScope.username+" was successfully registered. You can now log in!",'login','g');
+					if($rootScope.reg_stat=='provider'){
+					feedback($rootScope.username+" your "+$rootScope.provider+" account was successfully registered. You may now Login via "+$rootScope.provider+".",'login','g');
+					}else{
+					feedback($rootScope.username+" was successfully registered. An E-mail verification link was sent to your "+$rootScope.email+" inbox.",'login','g');
+					}
 				}
 				togglePassword.target('login_pass');	
 				this.reset=function(what){
@@ -41,15 +43,30 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 				//Retrieve Profile Data
 				passport.parseAPI().then(function(onSuccess){
 					if(onSuccess.acct_exists){
+						$rootScope.logged_stat=true;
+						login_success();
 						$scope.$apply($location.path('todolog'));
 					}else{
+						//Prompt end-user they're about to Initialize their Social account. 
+						if($rootScope.provider!="todolog"){
 						$('#msg_box').slideDown(1000);
+						}else{//Auto Initialize Todolog Account
+							passport.initAccount().then(function(onSuccess){
+								if(onSuccess.success){
+									$rootScope.logged_stat=true;
+									login_success();
+									$scope.$apply($location.path('todolog'));
+								}else{
+									$scope.$apply($location.path('login'));
+								}
+							});
+						}
 					}
 				});
 
 				//Third-party Login Authentication (Google, Twitter, Facebook)
 				this.popup=function(provider){
-					passport.selectProvider(provider);
+					passport.selectProvider(provider,'login');
 				};
 				this.login=function(){
 					//$rootScope.persist=this.persist;
@@ -79,6 +96,9 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 											case 'password':
 												feedback("You've entered the wrong Password.",'login','e');
 												break;
+											case 'locked':
+												feedback("You must first click the verification link sent to your E-mail inbox.",'login','e');
+												break;
 										}
 									}
 								}
@@ -100,6 +120,9 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 										case 'password':
 											feedback("You've entered the wrong Password.",'login','e');
 											break;
+										case 'locked':
+											feedback("You must first click the verification link sent to your E-mail inbox.",'login','e');
+											break;
 									}
 								}
 							}
@@ -114,32 +137,36 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 		}).when('/password-reset',{
 			url:'/password-reset',
 			templateUrl:'views/password-reset.html',
-			controller:["$scope","$rootScope",function($scope,$rootScope){
+			controller:["$scope","$rootScope","http_post",function($scope,$rootScope,http_post){
 				$('#signup-opt').hide();
 				this.email=null;
 				//Handles Password Reset Requests.
 				this.password=function(){
 					$rootScope.email=this.email;
-					$rootScope.fb_ref=new Firebase("https://todolog.firebaseio.com");
 					var email_opt=/^[a-zA-Z0-9]{1,}\@[a-zA-Z]{2,}\.\D{2,}$/.exec(this.email);
 					if(email_opt==null){
-					feedback("You must enter in the E-mail address associated with your Todolog account.",'pwd_reset','e');
-					$('#email_input').addClass('ng-dirty ng-invalid');
+						feedback("You must enter in the E-mail address associated with your Todolog account.",'pwd_reset','e');
+						$('#email_input').addClass('ng-dirty ng-invalid');
 					}else{
-					$rootScope.fb_ref.resetPassword({email:this.email}, function(onError){
-						if(onError==null){
-							$('#pwd-reset-ui').html("<h2>Password Reset</h2></br>Instructions to reset your password has been sent to "+this.email+"</br></br>Check your inbox ;)").show();
-							feedback($('#pwd_reset_feedback').val(),'pwd_reset','e');
-						}else{
-							switch(onError.code){
-								case 'INVALID_USER':
-									$('#pwd_reset_feedback').html("The E-mail address <span style='color:rgb(255,0,0);'>"+$rootScope.email+"</span> doesn't exist.</br></br>Please try again.");
-									$('#signup-opt').show();
-									$('#email_input').addClass('ng-dirty ng-invalid');
-									break;
+						var serialized_data=("email="+this.email);
+						http_post.with_this('/password-reset',serialized_data).then(function(onSuccess){
+							if(onSuccess.data.success){
+								$('#pwd-reset-ui').html("<h2>Password Reset</h2></br>Instructions to reset your password has been sent to "+$rootScope.email+"</br></br>Check your inbox ;)");
+							}else{
+								if(onSuccess.data.error){
+									switch(onSuccess.data.error_type){
+										case 'INVALID_USER':
+											$('#pwd_reset_feedback').html("The E-mail address <span style='color:rgb(255,0,0);'>"+$rootScope.email+"</span> doesn't exist.</br></br>Please try again.");
+											$('#signup-opt').show();
+											$('#email_input').addClass('ng-dirty ng-invalid');
+											break;
+										case 'FAILED':
+											$('#pwd_reset_feedback').html("<span style='color:rgb(255,0,0);'>Failed to render a temporary password.</span></br></br>Please try again.");
+											break;
+									}
+								}
 							}
-						}
-					});
+						});
 					}
 				};
 			}],
@@ -147,11 +174,41 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 		}).when('/signup',{
 			url:'/signup',
 			templateUrl:'views/signup.html',
-			controller:["$scope","$rootScope","$location","togglePassword","http_post", function($scope, $rootScope, $location, togglePassword, http_post){
+			controller:["$scope","$rootScope","$location","togglePassword","http_post","passport", function($scope, $rootScope, $location, togglePassword, http_post, passport){
 			this.username=null;
 			this.email=null;
 			this.pass=null;
+			base_menu();
+			$('#activation').hide();
 			togglePassword.target('signup_pass');
+			this.cancel=function(){
+				$('#activation').hide();
+				//$scope.$apply($location.path('logout'));
+			};
+			//Third-party Signup Authentication (Google, Twitter, Facebook)
+			this.popup=function(provider){
+				passport.selectProvider(provider,'signup');
+			};
+			//Retrieve Profile Data
+			passport.parseAPI().then(function(onSuccess){
+				if(onSuccess.acct_exists){
+					feedback("Hey "+$rootScope.username+"!... Your "+$rootScope.provider+" account is already registered with CHAMP!! You can <a href='/login'>Click Here</a> to Login.",'signup','g');
+				}else{
+					//Prompt end-user they're about to Initialize their Social account. 
+					if($rootScope.provider!="todolog"){
+						$('#activation').slideDown(1000);
+					}else{//Auto Initialize Todolog Account
+						passport.initAccount().then(function(onSuccess){
+							if(onSuccess.success){
+								$rootScope.reg_stat='provider';
+								$scope.$apply($location.path('login'));
+							}else{
+								$scope.$apply($location.path('signup'));
+							}
+						});
+					}
+				}
+			});
 			this.reg=function(){
 					feedback("Attempting to register supplied credentials.",'signup','g');
 					//Use JS RegEx to filter Username vailiation
@@ -201,6 +258,15 @@ angular.module('angularRoutes',[]).config(["$routeProvider", "$locationProvider"
 		}).when('/todolog',{
 			url:'/todolog',
 			templateUrl:'views/todolog.html'
+		}).when('/verif_success',{
+			url:'/verif_success',
+			templateUrl:'views/verif_success.html',
+			controller:["refresh", function(refresh){
+				$('#todolog_btn,.todo_ui_btn').hide();//Hide any Todolog_UI buttons, 'Settings', 'Logout', [etc...]
+				$('.root_ui_btn').show();//Display only the 'Login' & 'Signup' buttons.
+				//refresh.page(3000);//After 1 milisecond, refresh the login page.
+			}],
+			controllerAs:"verif_success"
 		}).when('/about',{
 			url:'/about',
 			templateUrl:'views/about.html'

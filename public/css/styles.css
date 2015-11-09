@@ -3,6 +3,11 @@
 	padding:0px;
 	font-size:2em;
 }
+
+.align-center>li{
+	text-align:center;
+	margin-height:50%;
+}
 #msg_box_txt{
 	font-size:2em;
 }
@@ -28,11 +33,24 @@
 }
 .div-half{
 	height:100%;
-	width:40%;
+	width:50%;
 }
 .login-ui{
 	width:650px;
 	height:260px;
+}
+.signup-ui{
+	width:650px;
+	height:260px;
+}
+#champ_logo{
+	margin:10%;
+	width:50px;
+	height:50px;
+}
+#lock_icon{
+	width:10px;
+	height:10px;
 }
 .txt-right{
 	text-align:right;
@@ -51,6 +69,21 @@
 }
 .wrap_txt{
 	white-space:normal;
+}
+#activation_txt{
+	font-size:10pt;
+}
+.activation{
+	white-space:normal;
+	display:block;
+	position:absolute;
+	top:5%;
+	left:15%;
+	width:400px;
+	height:300px;
+	z-index:1;
+	background-color:rgb(200,200,200);
+	border-radius:1px 1px 1px 1px;
 }
 .msg_box{
 	white-space:normal;
@@ -108,6 +141,11 @@ input[id$="pass_input"]{
 	margin-left:70%;
 	white-space:nowrap;
 	width:100px;
+}
+.f_right{
+	float:right;
+	margin:0px;
+	padding:0px;
 }
 .f_left{
 	float:left;

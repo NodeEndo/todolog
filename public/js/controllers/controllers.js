@@ -8,9 +8,8 @@ ctrl.controller('main_ctrl',["$scope", "$rootScope",
 		}]);
 
 ctrl.controller('root_ctrl',["$scope", "$rootScope", "$location", "$http", "passport", function($scope, $rootScope, $location, $http, passport){
-	//$('#todolog_btn').hide();
 	$rootScope.logged_stat=false;
-	this.redir=function(action){
+	this.redir=function(action,dsp_prompt){
 		switch(action){
 			case 'splash':
 				if($rootScope.logged_stat==false){
@@ -38,7 +37,6 @@ ctrl.controller('root_ctrl',["$scope", "$rootScope", "$location", "$http", "pass
 						$scope.$apply($location.path('login'));
 					}
 				});
-				$scope.$apply($location.path('todolog'));
 				break;
 			case 'logout':
 				$http.get('/logout').then(function(ret){
@@ -92,7 +90,7 @@ ctrl.controller('edit_ctrl',["$rootScope", "$scope","persist",function($rootScop
 								persist.now('set','save',path.days);
 							}
 						});
-					}a
+					}
 				});
 			}
 		});
